@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GPA & Athletic Eligibility Calculator (7-pt / 10-pt · NCAA · NAIA)</title>
+<style>
+  :root{
+    --navy:#1f4e78; --navy2:#2e6da4; --bg:#f4f6f9; --card:#fff; --line:#dfe4ea;
+    --green:#1e7d34; --greenbg:#e6f4ea; --red:#b3261e; --redbg:#fbe9e7; --amber:#8a6d00; --amberbg:#fff7e0;
+    --ink:#1f2733; --muted:#6b7280;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,Segoe UI,Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
+  header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:22px 20px}
+  header h1{margin:0 0 4px;font-size:1.45rem}
+  header p{margin:0;opacity:.9;font-size:.92rem}
+  .wrap{max-width:1100px;margin:0 auto;padding:18px 16px 60px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:16px 0;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+  .card h2{margin:0 0 12px;font-size:1.12rem;color:var(--navy);display:flex;align-items:center;gap:8px}
+  .card h2 .n{background:var(--navy);color:#fff;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-size:.85rem}
+  .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  button{font:inherit;border:1px solid var(--navy);background:var(--navy);color:#fff;padding:8px 14px;border-radius:7px;cursor:pointer}
+  button.sec{background:#fff;color:var(--navy)}
+  button.ghost{background:#fff;color:var(--muted);border-color:var(--line)}
+  button:hover{filter:brightness(1.05)}
+  table{border-collapse:collapse;width:100%;font-size:.9rem}
+  th,td{border:1px solid var(--line);padding:6px 8px;text-align:center}
+  th{background:#eef3f8;color:var(--navy);position:sticky;top:0}
+  td.l,th.l{text-align:left}
+  input,select{font:inherit;padding:5px 6px;border:1px solid var(--line);border-radius:6px;width:100%;background:#fff}
+  input.pct{width:64px}
+  .tablewrap{overflow:auto;max-height:430px;border:1px solid var(--line);border-radius:8px}
+  .del{color:var(--red);border-color:var(--red);background:#fff;padding:3px 8px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+  .res{border:1px solid var(--line);border-radius:10px;padding:14px;background:#fcfdff}
+  .res h3{margin:0 0 8px;font-size:1rem;color:var(--navy)}
+  .big{font-size:2rem;font-weight:700;line-height:1}
+  .vs{display:flex;gap:18px;margin:6px 0}
+  .vs div{flex:1}
+  .vs .lab{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+  .badge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.78rem;font-weight:700;margin:2px 4px 2px 0}
+  .pass{background:var(--greenbg);color:var(--green);border:1px solid var(--green)}
+  .fail{background:var(--redbg);color:var(--red);border:1px solid var(--red)}
+  .pend{background:var(--amberbg);color:var(--amber);border:1px solid var(--amber)}
+  .note{font-size:.82rem;color:var(--muted);margin-top:8px}
+  .settings{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+  .settings fieldset{border:1px solid var(--line);border-radius:8px}
+  .settings legend{color:var(--navy);font-weight:700;font-size:.85rem;padding:0 6px}
+  .settings label{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:.85rem;margin:4px 0}
+  .settings input{width:62px}
+  details summary{cursor:pointer;color:var(--navy);font-weight:600}
+  .small{font-size:.8rem;color:var(--muted)}
+  .up{color:var(--green);font-weight:700}
+  @media print{
+    header{background:var(--navy)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .noprint{display:none!important}
+    .card{break-inside:avoid}
+    body{background:#fff}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>GPA &amp; Athletic Eligibility Calculator</h1>
+  <p>Converts grades on a <b>7-point</b> and <b>10-point</b> scale · computes <b>NCAA</b> core GPA (DI/DII) and <b>NAIA</b> GPA · 100% in your browser — no data leaves this device.</p>
+</header>
+<div class="wrap">
+
+  <!-- STEP 1: data -->
+  <div class="card">
+    <h2><span class="n">1</span>Enter or import courses</h2>
+    <div class="row noprint" style="margin-bottom:10px">
+      <button class="sec" onclick="addRow()">+ Add course</button>
+      <button class="sec" onclick="addPlanned()">+ Add planned (senior) course</button>
+      <button class="sec" onclick="document.getElementById('csvin').click()">Import CSV…</button>
+      <input id="csvin" type="file" accept=".csv,text/csv" style="display:none" onchange="importCSV(this)">
+      <button class="ghost" onclick="downloadTemplate()">Download CSV template</button>
+      <button class="ghost" onclick="loadSample()">Load sample data</button>
+      <button class="ghost" onclick="clearAll()">Clear all</button>
+    </div>
+    <div class="tablewrap">
+      <table id="grid">
+        <thead><tr>
+          <th class="l">Term</th><th class="l">Course</th><th>Category</th>
+          <th>%</th><th>Credit&nbsp;hrs</th><th>Track</th>
+          <th>7-pt</th><th>10-pt</th><th class="noprint" title="Check planned / future senior-year courses">Plan?</th><th class="noprint"></th>
+        </tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <p class="note">Enter one row per <b>semester</b> grade (the values that earn credit). Each core semester course counts as 0.5 NCAA unit by default (editable in Settings). “Credit hrs” is used for the overall GPA — enter <b>0</b> for a failed/no-credit course if your school awards no credit for it.</p>
+  </div>
+
+  <!-- STEP 2: scales -->
+  <div class="card noprint">
+    <h2><span class="n">2</span>Grading scale settings</h2>
+    <details open><summary>Adjust cutoffs &amp; weighting (defaults shown)</summary>
+      <div class="settings" style="margin-top:12px">
+        <fieldset><legend>7-point min %</legend>
+          <label>A ≥ <input type="number" id="s7A" value="93"></label>
+          <label>B ≥ <input type="number" id="s7B" value="85"></label>
+          <label>C ≥ <input type="number" id="s7C" value="77"></label>
+          <label>D ≥ <input type="number" id="s7D" value="70"></label>
+        </fieldset>
+        <fieldset><legend>10-point min %</legend>
+          <label>A ≥ <input type="number" id="s10A" value="90"></label>
+          <label>B ≥ <input type="number" id="s10B" value="80"></label>
+          <label>C ≥ <input type="number" id="s10C" value="70"></label>
+          <label>D ≥ <input type="number" id="s10D" value="60"></label>
+        </fieldset>
+        <fieldset><legend>Weighting bonus</legend>
+          <label>Honors + <input type="number" step="0.1" id="bH" value="0.5"></label>
+          <label>AP + <input type="number" step="0.1" id="bAP" value="1.0"></label>
+        </fieldset>
+        <fieldset><legend>NCAA / NAIA</legend>
+          <label>NCAA unit/course <input type="number" step="0.5" id="ncaaUnit" value="0.5"></label>
+          <label>DI min <input type="number" step="0.1" id="diMin" value="2.3"></label>
+          <label>DII min <input type="number" step="0.1" id="diiMin" value="2.2"></label>
+          <label>NAIA min <input type="number" step="0.1" id="naiaMin" value="2.3"></label>
+        </fieldset>
+      </div>
+      <p class="note">Default 7-point cutoffs use the common A93/B85/C77/D70 scale; adjust to match your school exactly (some, like the sample school, start C at 78). NCAA &amp; NAIA use straight A=4/B=3/C=2/D=1 with <b>no</b> weighting.</p>
+    </details>
+  </div>
+
+  <!-- STEP 3: results -->
+  <div class="card">
+    <h2><span class="n">3</span>Results</h2>
+    <div class="row noprint" style="margin-bottom:10px;gap:16px">
+      <span class="small"><b>View:</b></span>
+      <label class="small"><input type="radio" name="vm" value="completed" onchange="setView('completed')"> Completed only</label>
+      <label class="small"><input type="radio" name="vm" value="projected" checked onchange="setView('projected')"> Projected (incl. planned senior year)</label>
+      <span class="small" id="viewInfo" style="margin-left:auto"></span>
+    </div>
+    <div class="grid">
+      <div class="res">
+        <h3>Overall GPA <span class="small">(all courses, 4.0)</span></h3>
+        <table>
+          <tr><th class="l">Scale</th><th>Unweighted</th><th>Weighted</th></tr>
+          <tr><td class="l">7-point (current)</td><td id="ov7u">–</td><td id="ov7w">–</td></tr>
+          <tr><td class="l">10-point (new)</td><td id="ov10u" class="up">–</td><td id="ov10w" class="up">–</td></tr>
+        </table>
+        <p class="note">Weighted by credit hours; Honors/AP bonus on passing grades only.</p>
+      </div>
+
+      <div class="res">
+        <h3>NCAA Core GPA <span class="small">(core academic only)</span></h3>
+        <table>
+          <tr><th class="l">Scale</th><th>Core GPA</th><th>Units</th></tr>
+          <tr><td class="l">7-point</td><td id="nc7">–</td><td id="nu7">–</td></tr>
+          <tr><td class="l">10-point</td><td id="nc10" class="up">–</td><td id="nu10">–</td></tr>
+        </table>
+        <div style="margin-top:8px">
+          <div><b>7-pt:</b> <span id="b7di"></span><span id="b7dii"></span></div>
+          <div><b>10-pt:</b> <span id="b10di"></span><span id="b10dii"></span></div>
+        </div>
+        <p class="note" id="ncaaUnitsNote"></p>
+      </div>
+
+      <div class="res">
+        <h3>NAIA GPA <span class="small">(overall, 4.0)</span></h3>
+        <table>
+          <tr><th class="l">Scale</th><th>GPA</th><th>Status</th></tr>
+          <tr><td class="l">7-point</td><td id="na7">–</td><td id="na7b"></td></tr>
+          <tr><td class="l">10-point</td><td id="na10" class="up">–</td><td id="na10b"></td></tr>
+        </table>
+        <p class="note">NAIA uses the <b>overall</b> GPA (not a core GPA). The GPA leg is one of NAIA’s “2 of 3” requirements (GPA ≥ 2.3, OR test score, OR top-50% class rank).</p>
+      </div>
+    </div>
+    <div class="row noprint" style="margin-top:14px">
+      <button class="sec" onclick="exportResults()">Export results (CSV)</button>
+      <button class="sec" onclick="exportCourses()">Export courses (CSV)</button>
+      <button class="ghost" onclick="window.print()">Print / Save as PDF</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <details><summary>Methodology &amp; disclaimers</summary>
+      <div class="small" style="margin-top:10px">
+        <p><b>Overall GPA:</b> percentage → letter via the chosen scale → points (A=4…F=0). Weighted adds the Honors/AP bonus to passing grades, then averages by credit hours.</p>
+        <p><b>NCAA core GPA:</b> only core-academic courses count — English, Math (Algebra I+), Natural/Physical Science, Social Science, Foreign Language, and Other Academic. Electives such as Band, PE, Health, Personal Finance, and study halls are excluded. <b>No</b> honors/AP weighting and <b>no</b> +/-. Each core semester course = 0.5 unit. A failing grade earns 0 units (consistent with the NCAA “best 16 core courses” rule). DI full qualifier ≥ 2.3, DII ≥ 2.2. 16 core units are required by graduation (10, incl. 7 in Eng/Math/Sci, before the 7th semester).</p>
+        <p><b>NAIA:</b> uses the student’s overall (cumulative) GPA on a 4.0 scale. A 2.3 overall GPA satisfies one of NAIA’s three requirements; a student must meet at least two of: GPA ≥ 2.3, ACT 18/SAT 970, or top-50% class rank.</p>
+        <p><b>Verify with officials.</b> Confirm your school’s exact grading scale and weighting, and check the school’s official NCAA-approved core-course list at the NCAA Eligibility Center. This tool is for planning only and does not determine eligibility.</p>
+      </div>
+    </details>
+  </div>
+
+</div>
+
+<script>
+const CORE_CATS = ["English","Math","Science","Social Science","Foreign Language","Other Academic"];
+const CATS = [...CORE_CATS, "Elective / Non-Core"];
+const TRACKS = ["Regular","Honors","AP"];
+const GP = {A:4,B:3,C:2,D:1,F:0};
+let data = [];
+
+function num(id){ return parseFloat(document.getElementById(id).value)||0; }
+function scale7(){ return {A:num('s7A'),B:num('s7B'),C:num('s7C'),D:num('s7D')}; }
+function scale10(){ return {A:num('s10A'),B:num('s10B'),C:num('s10C'),D:num('s10D')}; }
+function bonus(track){ return track==="Honors"?num('bH'):track==="AP"?num('bAP'):0; }
+function letter(pct,s){ if(pct>=s.A)return"A"; if(pct>=s.B)return"B"; if(pct>=s.C)return"C"; if(pct>=s.D)return"D"; return"F"; }
+function isCore(cat){ return CORE_CATS.includes(cat); }
+
+let viewMode = 'projected';
+function setView(m){ viewMode=m; compute(); }
+function blankRow(){ return {term:"",course:"",cat:"English",pct:"",hrs:1,track:"Regular",planned:false}; }
+function addRow(r){ data.push(r||blankRow()); render(); }
+function addPlanned(){ const r=blankRow(); r.planned=true; r.term="Senior"; data.push(r); render(); }
+function updPlanned(i,checked){ data[i].planned=checked; compute(); save(); }
+function delRow(i){ data.splice(i,1); render(); }
+function clearAll(){ if(confirm("Remove all courses?")){ data=[]; render(); } }
+
+function opt(list,val){ return list.map(o=>`<option ${o===val?'selected':''}>${o}</option>`).join(''); }
+
+function render(){
+  const tb=document.getElementById('rows');
+  tb.innerHTML = data.map((d,i)=>{
+    const l7=d.pct!==""?letter(+d.pct,scale7()):"";
+    const l10=d.pct!==""?letter(+d.pct,scale10()):"";
+    const up=(l7&&l10&&l7!==l10)?'class="up"':'';
+    return `<tr>
+      <td class="l"><input value="${esc(d.term)}" oninput="upd(${i},'term',this.value)"></td>
+      <td class="l"><input value="${esc(d.course)}" oninput="upd(${i},'course',this.value)"></td>
+      <td><select onchange="upd(${i},'cat',this.value)">${opt(CATS,d.cat)}</select></td>
+      <td><input class="pct" type="number" value="${d.pct}" oninput="upd(${i},'pct',this.value)"></td>
+      <td><input class="pct" type="number" step="0.5" value="${d.hrs}" oninput="upd(${i},'hrs',this.value)"></td>
+      <td><select onchange="upd(${i},'track',this.value)">${opt(TRACKS,d.track)}</select></td>
+      <td>${l7}</td><td ${up}>${l10}</td>
+      <td class="noprint"><input type="checkbox" ${d.planned?'checked':''} onchange="updPlanned(${i},this.checked)" style="width:auto"></td>
+      <td class="noprint"><button class="del" onclick="delRow(${i})">✕</button></td>
+    </tr>`;
+  }).join('');
+  compute(); save();
+}
+function esc(s){ return (s||"").replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+function upd(i,k,v){ data[i][k]=v; if(k==='pct'||k==='cat'||k==='track'||k==='hrs') render(); else { data[i][k]=v; compute(); save(); } }
+
+function compute(){
+  const s7=scale7(), s10=scale10(), unit=num('ncaaUnit');
+  let oh=0, o7u=0,o7w=0,o10u=0,o10w=0;
+  let n7q=0,n7u=0,n10q=0,n10u=0;
+  let planned=0;
+  for(const d of data){
+    if(d.planned) planned++;
+    if(viewMode==='completed' && d.planned) continue;
+    if(d.pct===""||isNaN(+d.pct)) continue;
+    const p=+d.pct, hrs=+d.hrs||0, b=bonus(d.track);
+    const L7=letter(p,s7), L10=letter(p,s10);
+    const p7=GP[L7], p10=GP[L10];
+    const w7=p7>0?p7+b:0, w10=p10>0?p10+b:0;
+    oh+=hrs; o7u+=p7*hrs; o7w+=w7*hrs; o10u+=p10*hrs; o10w+=w10*hrs;
+    if(isCore(d.cat)){
+      if(L7!=="F"){ n7u+=unit; n7q+=p7*unit; }
+      if(L10!=="F"){ n10u+=unit; n10q+=p10*unit; }
+    }
+  }
+  const f=(x)=> x.toFixed(2);
+  const f3=(x)=> x.toFixed(3);
+  set('ov7u', oh?f(o7u/oh):'–'); set('ov7w', oh?f(o7w/oh):'–');
+  set('ov10u', oh?f(o10u/oh):'–'); set('ov10w', oh?f(o10w/oh):'–');
+
+  const g7 = n7u? n7q/n7u : null, g10 = n10u? n10q/n10u : null;
+  set('nc7', g7!=null?f3(g7):'–'); set('nu7', n7u.toFixed(1));
+  set('nc10', g10!=null?f3(g10):'–'); set('nu10', n10u.toFixed(1));
+  badge('b7di', g7, num('diMin'), 'DI');
+  badge('b7dii', g7, num('diiMin'), 'DII');
+  badge('b10di', g10, num('diMin'), 'DI');
+  badge('b10dii', g10, num('diiMin'), 'DII');
+  const unitsHave=Math.max(n7u,n10u);
+  set('ncaaUnitsNote', `${unitsHave.toFixed(1)} core units entered (16 required by graduation). ` + (unitsHave<16?'More core courses still needed.':'Meets the 16-unit count.'));
+
+  // NAIA uses overall (unweighted) GPA
+  set('na7', oh?f(o7u/oh):'–'); set('na10', oh?f(o10u/oh):'–');
+  naia('na7b', oh?o7u/oh:null); naia('na10b', oh?o10u/oh:null);
+
+  const vi=document.getElementById('viewInfo');
+  if(vi) vi.textContent = planned
+    ? (viewMode==='projected' ? `Projected — includes ${planned} planned course${planned>1?'s':''}` : `Completed only — ${planned} planned course${planned>1?'s':''} hidden`)
+    : 'No planned courses yet — add senior-year rows to project graduation.';
+}
+function set(id,v){ document.getElementById(id).textContent=v; }
+function badge(id,gpa,min,label){
+  const el=document.getElementById(id);
+  if(gpa==null){ el.innerHTML=`<span class="badge pend">${label} –</span>`; return; }
+  const ok=gpa>=min;
+  el.innerHTML=`<span class="badge ${ok?'pass':'fail'}">${label} ${ok?'PASS':'FAIL'} (≥${min})</span>`;
+}
+function naia(id,gpa){
+  const el=document.getElementById(id);
+  if(gpa==null){ el.innerHTML=''; return; }
+  const min=num('naiaMin'), ok=gpa>=min;
+  el.innerHTML=`<span class="badge ${ok?'pass':'fail'}">${ok?'MEETS':'BELOW'} ${min} leg</span>`;
+}
+
+/* ---------- CSV ---------- */
+const HEADERS=["Term","Course","Category","Percent","CreditHours","Track","Planned"];
+function downloadTemplate(){
+  const rows=[HEADERS.join(','),
+    'Freshman S1,English 9,English,88,1,Regular,No',
+    'Freshman S1,Algebra I,Math,82,1,Regular,No',
+    'Freshman S1,Band,Elective / Non-Core,95,1,Regular,No',
+    'Senior S1,English 12,English,85,1,Honors,Yes'];
+  dl('gpa_template.csv', rows.join('\n'));
+}
+function exportCourses(){
+  const rows=[HEADERS.join(',')];
+  for(const d of data) rows.push([d.term,d.course,d.cat,d.pct,d.hrs,d.track,d.planned?'Yes':'No'].map(csvCell).join(','));
+  dl('my_courses.csv', rows.join('\n'));
+}
+function exportResults(){
+  const g=(id)=>document.getElementById(id).textContent;
+  const rows=[
+    ['Metric','7-point','10-point'].join(','),
+    ['Overall GPA (unweighted)',g('ov7u'),g('ov10u')].join(','),
+    ['Overall GPA (weighted)',g('ov7w'),g('ov10w')].join(','),
+    ['NCAA core GPA',g('nc7'),g('nc10')].join(','),
+    ['NCAA core units',g('nu7'),g('nu10')].join(','),
+    ['NAIA overall GPA',g('na7'),g('na10')].join(',')
+  ];
+  dl('eligibility_results.csv', rows.join('\n'));
+}
+function csvCell(v){ v=(''+v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
+function dl(name,text){
+  const b=new Blob([text],{type:'text/csv'}); const u=URL.createObjectURL(b);
+  const a=document.createElement('a'); a.href=u; a.download=name; a.click(); URL.revokeObjectURL(u);
+}
+function importCSV(input){
+  const file=input.files[0]; if(!file) return;
+  const rd=new FileReader();
+  rd.onload=e=>{ try{ parseCSV(e.target.result); }catch(err){ alert('Could not parse CSV: '+err.message); } input.value=''; };
+  rd.readAsText(file);
+}
+function parseCSV(text){
+  const lines=text.replace(/\r/g,'').split('\n').filter(l=>l.trim().length);
+  if(!lines.length) return;
+  const head=splitCSV(lines[0]).map(h=>h.trim().toLowerCase());
+  const idx=(name)=>head.findIndex(h=>h.replace(/[^a-z]/g,'')===name);
+  const iT=idx('term'),iC=idx('course'),iCat=idx('category'),iP=idx('percent'),iH=idx('credithours'),iTr=idx('track'),iPl=idx('planned');
+  if(iP<0){ alert('CSV must include a "Percent" column. Headers found: '+head.join(', ')); return; }
+  const out=[];
+  for(let k=1;k<lines.length;k++){
+    const c=splitCSV(lines[k]);
+    const cat=normCat(c[iCat]); const tr=normTrack(c[iTr]);
+    const pl = iPl>=0 ? /^(y|t|1)/i.test((c[iPl]||'').trim()) : false;
+    out.push({term:c[iT]||"",course:c[iC]||"",cat:cat,pct:(c[iP]||"").trim(),hrs:parseFloat(c[iH])||0,track:tr,planned:pl});
+  }
+  data=out; render();
+}
+function splitCSV(line){
+  const res=[]; let cur='',q=false;
+  for(let i=0;i<line.length;i++){ const ch=line[i];
+    if(q){ if(ch=='"'){ if(line[i+1]=='"'){cur+='"';i++;} else q=false; } else cur+=ch; }
+    else { if(ch=='"')q=true; else if(ch==',' ){res.push(cur);cur='';} else cur+=ch; } }
+  res.push(cur); return res;
+}
+function normCat(s){ s=(s||'').trim().toLowerCase();
+  if(s.startsWith('eng'))return'English'; if(s.startsWith('math'))return'Math';
+  if(s.startsWith('sci'))return'Science'; if(s.startsWith('soc'))return'Social Science';
+  if(s.startsWith('for')||s.includes('lang'))return'Foreign Language';
+  if(s.startsWith('oth'))return'Other Academic'; return'Elective / Non-Core'; }
+function normTrack(s){ s=(s||'').trim().toLowerCase();
+  if(s.startsWith('ap'))return'AP'; if(s.startsWith('hon'))return'Honors'; return'Regular'; }
+
+/* ---------- persistence + sample ---------- */
+function save(){ try{ localStorage.setItem('gpaCalc', JSON.stringify(data)); }catch(e){} }
+function load(){ try{ const s=localStorage.getItem('gpaCalc'); if(s) data=JSON.parse(s); }catch(e){} }
+
+function loadSample(){
+  data=[
+   r('Fr S1','Algebra I','Math',86,1),r('Fr S1','Band','Elective / Non-Core',91,1),
+   r('Fr S1','French I','Foreign Language',75,1),r('Fr S1','Health','Elective / Non-Core',84,0.5),
+   r('Fr S1','Honors English 9','English',78,1,'Honors'),r('Fr S1','PE','Elective / Non-Core',99,0.5),
+   r('Fr S1','Physical Science','Science',82,1),r('Fr S1','World Geography','Social Science',86,1),
+   r('Fr S2','Algebra I','Math',86,1),r('Fr S2','Band','Elective / Non-Core',98,1),
+   r('Fr S2','Civics','Social Science',76,1),r('Fr S2','French I','Foreign Language',74,1),
+   r('Fr S2','Honors English 9','English',81,1,'Honors'),r('Fr S2','Physical Science','Science',74,1),
+   r('So S1','AP World History','Social Science',78,1,'AP'),r('So S1','Band','Elective / Non-Core',84,1),
+   r('So S1','Biology I','Science',76,1),r('So S1','French II','Foreign Language',70,1),
+   r('So S1','Geometry','Math',81,1),r('So S1','Honors English 10','English',64,0,'Honors'),
+   r('So S2','AP World History','Social Science',87,1,'AP'),r('So S2','Band','Elective / Non-Core',97,1),
+   r('So S2','Biology I','Science',80,1),r('So S2','French II','Foreign Language',71,1),
+   r('So S2','Geometry','Math',78,1),r('So S2','Honors English 10','English',73,1,'Honors'),
+   r('Jr S1','Algebra II','Math',78,1),r('Jr S1','AP US History','Social Science',77,1,'AP'),
+   r('Jr S1','Band','Elective / Non-Core',90,1),r('Jr S1','Chemistry','Science',66,0),
+   r('Jr S1','English 10','English',86,1),r('Jr S1','English 11','English',80,1),
+   r('Jr S2','Algebra II','Math',85,1),r('Jr S2','AP US History','Social Science',82,1,'AP'),
+   r('Jr S2','Band','Elective / Non-Core',98,1),r('Jr S2','Chemistry','Science',83,1),
+   r('Jr S2','English 11','English',81,1),r('Jr S2','Personal Finance & Careers','Elective / Non-Core',84,1)
+  ];
+  // sample school starts C at 78 on the 7-point scale
+  document.getElementById('s7C').value=78;
+  render();
+}
+function r(term,course,cat,pct,hrs,track){ return {term,course,cat,pct:''+pct,hrs,track:track||'Regular'}; }
+
+// recompute when any setting changes
+document.querySelectorAll('.settings input').forEach(el=>el.addEventListener('input',compute));
+
+load();
+if(!data.length) loadSample(); else render();
+render();
+</script>
+</body>
+</html>
