@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GPA & Athletic Eligibility Calculator (7-pt / 10-pt · NCAA · NAIA)</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<meta name="theme-color" content="#1f4e78">
 <style>
   :root{
     --navy:#1f4e78; --navy2:#2e6da4; --bg:#f4f6f9; --card:#fff; --line:#dfe4ea;
@@ -13,8 +18,14 @@
   *{box-sizing:border-box}
   body{margin:0;font-family:-apple-system,Segoe UI,Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
   header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:22px 20px}
+  .hbar{display:flex;align-items:center;gap:16px;max-width:1100px;margin:0 auto}
+  .hbar img.mark{width:54px;height:54px;border-radius:12px;flex:none;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+  .hbar .htext{flex:1;min-width:0}
+  .brandtag{display:inline-block;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;opacity:.85;margin-top:6px}
   header h1{margin:0 0 4px;font-size:1.45rem}
   header p{margin:0;opacity:.9;font-size:.92rem}
+  footer{max-width:1100px;margin:0 auto;padding:18px 16px 40px;color:var(--muted);font-size:.82rem;display:flex;align-items:center;gap:10px}
+  footer img{width:22px;height:22px;border-radius:5px}
   .wrap{max-width:1100px;margin:0 auto;padding:18px 16px 60px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:16px 0;box-shadow:0 1px 2px rgba(0,0,0,.04)}
   .card h2{margin:0 0 12px;font-size:1.12rem;color:var(--navy);display:flex;align-items:center;gap:8px}
@@ -62,8 +73,14 @@
 </head>
 <body>
 <header>
-  <h1>GPA &amp; Athletic Eligibility Calculator</h1>
-  <p>Converts grades on a <b>7-point</b> and <b>10-point</b> scale · computes <b>NCAA</b> core GPA (DI/DII) and <b>NAIA</b> GPA · 100% in your browser — no data leaves this device.</p>
+  <div class="hbar">
+    <img class="mark" src="icon-512.png" alt="Warren Anderson Consulting LLC logo">
+    <div class="htext">
+      <h1>GPA &amp; Athletic Eligibility Calculator</h1>
+      <p>Converts grades on a <b>7-point</b> and <b>10-point</b> scale · computes <b>NCAA</b> core GPA (DI/DII) and <b>NAIA</b> GPA · 100% in your browser — no data leaves this device.</p>
+      <span class="brandtag">Warren Anderson Consulting LLC</span>
+    </div>
+  </div>
 </header>
 <div class="wrap">
 
@@ -187,8 +204,13 @@
   </div>
 
 </div>
+<footer>
+  <img src="favicon-32.png" alt="">
+  <span>© <span id="yr"></span> Warren Anderson Consulting LLC · For planning only — verify eligibility with your school and the NCAA Eligibility Center.</span>
+</footer>
 
 <script>
+document.getElementById('yr').textContent = new Date().getFullYear();
 const CORE_CATS = ["English","Math","Science","Social Science","Foreign Language","Other Academic"];
 const CATS = [...CORE_CATS, "Elective / Non-Core"];
 const TRACKS = ["Regular","Honors","AP"];
