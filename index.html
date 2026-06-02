@@ -389,29 +389,20 @@ function save(){ try{ localStorage.setItem('gpaCalc', JSON.stringify(data)); }ca
 function load(){ try{ const s=localStorage.getItem('gpaCalc'); if(s) data=JSON.parse(s); }catch(e){} }
 
 function loadSample(){
+  // Fictional example data for demonstration only — not a real student's record.
   data=[
-   r('Fr S1','Algebra I','Math',86,1),r('Fr S1','Band','Elective / Non-Core',91,1),
-   r('Fr S1','French I','Foreign Language',75,1),r('Fr S1','Health','Elective / Non-Core',84,0.5),
-   r('Fr S1','Honors English 9','English',78,1,'Honors'),r('Fr S1','PE','Elective / Non-Core',99,0.5),
-   r('Fr S1','Physical Science','Science',82,1),r('Fr S1','World Geography','Social Science',86,1),
-   r('Fr S2','Algebra I','Math',86,1),r('Fr S2','Band','Elective / Non-Core',98,1),
-   r('Fr S2','Civics','Social Science',76,1),r('Fr S2','French I','Foreign Language',74,1),
-   r('Fr S2','Honors English 9','English',81,1,'Honors'),r('Fr S2','Physical Science','Science',74,1),
-   r('So S1','AP World History','Social Science',78,1,'AP'),r('So S1','Band','Elective / Non-Core',84,1),
-   r('So S1','Biology I','Science',76,1),r('So S1','French II','Foreign Language',70,1),
-   r('So S1','Geometry','Math',81,1),r('So S1','Honors English 10','English',64,0,'Honors'),
-   r('So S2','AP World History','Social Science',87,1,'AP'),r('So S2','Band','Elective / Non-Core',97,1),
-   r('So S2','Biology I','Science',80,1),r('So S2','French II','Foreign Language',71,1),
-   r('So S2','Geometry','Math',78,1),r('So S2','Honors English 10','English',73,1,'Honors'),
-   r('Jr S1','Algebra II','Math',78,1),r('Jr S1','AP US History','Social Science',77,1,'AP'),
-   r('Jr S1','Band','Elective / Non-Core',90,1),r('Jr S1','Chemistry','Science',66,0),
-   r('Jr S1','English 10','English',86,1),r('Jr S1','English 11','English',80,1),
-   r('Jr S2','Algebra II','Math',85,1),r('Jr S2','AP US History','Social Science',82,1,'AP'),
-   r('Jr S2','Band','Elective / Non-Core',98,1),r('Jr S2','Chemistry','Science',83,1),
-   r('Jr S2','English 11','English',81,1),r('Jr S2','Personal Finance & Careers','Elective / Non-Core',84,1)
+   r('Fr S1','English 9','English',88,1),r('Fr S1','Algebra I','Math',82,1),
+   r('Fr S1','Biology','Science',85,1),r('Fr S1','World Geography','Social Science',90,1),
+   r('Fr S1','Spanish I','Foreign Language',86,1),r('Fr S1','Band','Elective / Non-Core',95,1),
+   r('Fr S2','English 9','English',84,1),r('Fr S2','Algebra I','Math',80,1),
+   r('Fr S2','Biology','Science',83,1),r('Fr S2','World Geography','Social Science',88,1),
+   r('So S1','English 10','English',86,1),r('So S1','Geometry','Math',81,1),
+   r('So S1','Chemistry','Science',79,1),r('So S1','World History','Social Science',84,1,'Honors'),
+   r('So S2','English 10','English',85,1),r('So S2','Geometry','Math',83,1),
+   r('Jr S1','English 11','English',87,1),r('Jr S1','Algebra II','Math',82,1),
+   r('Jr S1','Physics','Science',80,1),r('Jr S1','US History','Social Science',85,1,'AP'),
+   r('Senior','English 12','English',88,1,'Honors'),r('Senior','Pre-Calculus','Math',84,1)
   ];
-  // sample school starts C at 78 on the 7-point scale
-  document.getElementById('s7C').value=78;
   render();
 }
 function r(term,course,cat,pct,hrs,track){ return {term,course,cat,pct:''+pct,hrs,track:track||'Regular'}; }
@@ -420,7 +411,7 @@ function r(term,course,cat,pct,hrs,track){ return {term,course,cat,pct:''+pct,hr
 document.querySelectorAll('.settings input').forEach(el=>el.addEventListener('input',compute));
 
 load();
-if(!data.length) loadSample(); else render();
+if(!data.length) data=[blankRow(),blankRow(),blankRow()];
 render();
 </script>
 </body>
