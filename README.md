@@ -16,6 +16,18 @@ records (FERPA-friendly).
 > In the app, click **❓ How to use** (top-right of the header) for the same guide below. It
 > also opens automatically on your first visit.
 
+## Screenshots
+
+| Enter courses | Results & eligibility |
+|:---:|:---:|
+| ![Course entry with sample data](docs/screenshot-overview.png) | ![GPA results with NCAA DI/DII and NAIA checks](docs/screenshot-results.png) |
+
+Built-in **How to use** guide (opens automatically on first visit):
+
+![How-to-use help guide](docs/screenshot-help.png)
+
+*(Screenshots use fictional sample data.)*
+
 ## How to use
 
 ### 1. Enter the student's courses
