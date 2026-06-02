@@ -68,7 +68,21 @@
     .noprint{display:none!important}
     .card{break-inside:avoid}
     body{background:#fff}
+    .helpbtn,.modal{display:none!important}
   }
+  .helpbtn{flex:none;align-self:flex-start;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.6);color:#fff;padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:600}
+  .helpbtn:hover{background:rgba(255,255,255,.28)}
+  .modal{position:fixed;inset:0;background:rgba(15,23,35,.55);display:none;align-items:flex-start;justify-content:center;z-index:1000;padding:24px;overflow:auto}
+  .modal.open{display:flex}
+  .modal .box{background:#fff;max-width:760px;width:100%;border-radius:12px;padding:26px 30px;box-shadow:0 12px 40px rgba(0,0,0,.3);margin:auto}
+  .modal h2{color:var(--navy);margin:0 0 4px}
+  .modal h3{color:var(--navy);margin:20px 0 6px;font-size:1.02rem}
+  .modal ol,.modal ul{margin:6px 0 6px 0;padding-left:20px}
+  .modal li{margin:5px 0}
+  .modal .close{position:sticky;top:0;float:right;border:none;background:var(--navy);color:#fff;border-radius:50%;width:32px;height:32px;font-size:1.1rem;line-height:1;cursor:pointer}
+  .modal code{background:#eef3f8;padding:1px 5px;border-radius:4px;font-size:.88em}
+  .modal .tag{display:inline-block;background:#eef3f8;color:var(--navy);border-radius:6px;padding:1px 7px;font-size:.82rem;font-weight:600;margin:1px}
+  .modal .pass{background:var(--greenbg);color:var(--green)} .modal .fail{background:var(--redbg);color:var(--red)}
 </style>
 </head>
 <body>
@@ -80,8 +94,62 @@
       <p>Converts grades on a <b>7-point</b> and <b>10-point</b> scale · computes <b>NCAA</b> core GPA (DI/DII) and <b>NAIA</b> GPA · 100% in your browser — no data leaves this device.</p>
       <span class="brandtag">Warren Anderson Consulting LLC</span>
     </div>
+    <button class="helpbtn" onclick="openHelp()">❓ How to use</button>
   </div>
 </header>
+
+<div class="modal" id="helpModal" onclick="if(event.target===this)closeHelp()">
+  <div class="box">
+    <button class="close" onclick="closeHelp()" title="Close">✕</button>
+    <h2>How to use this calculator</h2>
+    <p class="small" style="color:var(--muted)">Estimate a student's GPA on both grading scales and check it against college-athletics academic standards. Everything runs in your browser — nothing you type is uploaded or saved anywhere but this device.</p>
+
+    <h3>1 · Enter the student's courses</h3>
+    <p>List <b>one row per semester grade</b> (the grades that earn credit). Three ways to add them:</p>
+    <ul>
+      <li><b>Type them in</b> — click <span class="tag">+ Add course</span> and fill each row.</li>
+      <li><b>Import a spreadsheet</b> — click <span class="tag">Download CSV template</span>, fill it in Excel/Google Sheets, then <span class="tag">Import CSV…</span>.</li>
+      <li><b>Try it first</b> — click <span class="tag">Load sample data</span> to see a worked example, then <span class="tag">Clear all</span> when ready.</li>
+    </ul>
+    <p>What each column means:</p>
+    <ul>
+      <li><b>Term</b> — e.g. <code>Freshman S1</code>. Just a label.</li>
+      <li><b>Course</b> — the class name.</li>
+      <li><b>Category</b> — pick the subject. Only academic categories (English, Math, Science, Social Science, Foreign Language, Other Academic) count toward the <b>NCAA</b> core GPA. Choose <code>Elective / Non-Core</code> for things like Band, PE, Health, or study hall.</li>
+      <li><b>%</b> — the percentage grade (e.g. <code>88</code>). The letter grade is figured automatically.</li>
+      <li><b>Credit hrs</b> — used for the overall GPA. Enter <code>0</code> for a failed/no-credit class if your school gives no credit for it.</li>
+      <li><b>Track</b> — <code>Regular</code>, <code>Honors</code>, or <code>AP</code>. Only affects the <i>weighted</i> overall GPA (NCAA/NAIA ignore weighting).</li>
+      <li><b>Plan?</b> — check this for <b>future/senior-year</b> courses you're projecting (see step 4).</li>
+    </ul>
+
+    <h3>2 · Match your school's grading scale</h3>
+    <p>Open <b>Grading scale settings</b> and set the cutoffs to match your school exactly. Defaults are the common 7-point (A≥93) and 10-point (A≥90) scales. You can also set the Honors/AP bonus and the NCAA/NAIA pass thresholds here.</p>
+
+    <h3>3 · Read the results</h3>
+    <ul>
+      <li><b>Overall GPA</b> — your full GPA on both scales, unweighted and weighted. Green = the 10-point (new) result.</li>
+      <li><b>NCAA Core GPA</b> — uses core-academic courses only, no weighting. The badges show pass/fail vs <span class="tag pass">DI ≥2.3</span> and <span class="tag pass">DII ≥2.2</span>, and it tracks progress toward the 16 required core units.</li>
+      <li><b>NAIA GPA</b> — your overall GPA vs the <b>2.3</b> benchmark (one of NAIA's "2 of 3" requirements).</li>
+    </ul>
+
+    <h3>4 · Project the senior year (optional)</h3>
+    <p>Add upcoming courses with the <b>Plan?</b> box checked (or use <span class="tag">+ Add planned (senior) course</span>). Then use the <b>View</b> toggle above the results to switch between <b>Completed only</b> and <b>Projected (incl. planned)</b> to see where the GPA is headed at graduation.</p>
+
+    <h3>5 · Save or share</h3>
+    <ul>
+      <li><span class="tag">Export results (CSV)</span> — the GPA/eligibility summary.</li>
+      <li><span class="tag">Export courses (CSV)</span> — your course list to reopen later.</li>
+      <li><span class="tag">Print / Save as PDF</span> — a clean printout to share with a counselor or coach.</li>
+    </ul>
+
+    <h3>Good to know</h3>
+    <ul>
+      <li>Your data is remembered only in <b>this browser</b> on this device — close and reopen and it's still here; open it elsewhere and you start fresh.</li>
+      <li>This tool is for <b>planning only</b>. Confirm your school's exact scale/weighting and its official NCAA-approved core-course list at the NCAA Eligibility Center; official eligibility is determined by the NCAA/NAIA.</li>
+    </ul>
+    <p style="text-align:center;margin-top:18px"><button onclick="closeHelp()">Got it — start using the tool</button></p>
+  </div>
+</div>
 <div class="wrap">
 
   <!-- STEP 1: data -->
@@ -211,6 +279,10 @@
 
 <script>
 document.getElementById('yr').textContent = new Date().getFullYear();
+function openHelp(){ document.getElementById('helpModal').classList.add('open'); }
+function closeHelp(){ document.getElementById('helpModal').classList.remove('open'); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeHelp(); });
+try{ if(!localStorage.getItem('seenHelp')){ openHelp(); localStorage.setItem('seenHelp','1'); } }catch(e){}
 const CORE_CATS = ["English","Math","Science","Social Science","Foreign Language","Other Academic"];
 const CATS = [...CORE_CATS, "Elective / Non-Core"];
 const TRACKS = ["Regular","Honors","AP"];
