@@ -11,6 +11,56 @@ grading scale and computes:
 Everything runs **client-side** — no server, no data leaves the browser. Suitable for student
 records (FERPA-friendly).
 
+**▶ Live app:** https://wacit.github.io/gpa-eligibility-calculator/
+
+> In the app, click **❓ How to use** (top-right of the header) for the same guide below. It
+> also opens automatically on your first visit.
+
+## How to use
+
+### 1. Enter the student's courses
+List **one row per semester grade** (the grades that earn credit). Three ways to add them:
+
+- **Type them in** — click **+ Add course** and fill each row.
+- **Import a spreadsheet** — click **Download CSV template**, fill it in Excel/Google Sheets, then **Import CSV…**.
+- **Try it first** — click **Load sample data** to see a worked example, then **Clear all** when ready.
+
+What each column means:
+
+| Column | What to enter |
+|--------|---------------|
+| **Term** | A label, e.g. `Freshman S1`. |
+| **Course** | The class name. |
+| **Category** | The subject. Only academic categories (English, Math, Science, Social Science, Foreign Language, Other Academic) count toward the **NCAA** core GPA. Use `Elective / Non-Core` for Band, PE, Health, study hall, etc. |
+| **%** | The percentage grade (e.g. `88`). The letter grade is computed automatically. |
+| **Credit hrs** | Used for the overall GPA. Enter `0` for a failed/no-credit class if your school awards no credit. |
+| **Track** | `Regular`, `Honors`, or `AP` — affects the *weighted* overall GPA only (NCAA/NAIA ignore weighting). |
+| **Plan?** | Check for **future/senior-year** courses you're projecting (see step 4). |
+
+### 2. Match your school's grading scale
+Open **Grading scale settings** and set the cutoffs to match your school exactly. Defaults are the
+common 7-point (A ≥ 93) and 10-point (A ≥ 90) scales. You can also set the Honors/AP bonus and the
+DI / DII / NAIA pass thresholds here.
+
+### 3. Read the results
+- **Overall GPA** — your full GPA on both scales, unweighted and weighted (green = the 10-point result).
+- **NCAA Core GPA** — core-academic courses only, no weighting; badges show pass/fail vs **DI ≥ 2.3** and **DII ≥ 2.2**, and it tracks progress toward the 16 required core units.
+- **NAIA GPA** — your overall GPA vs the **2.3** benchmark (one of NAIA's "2 of 3" requirements).
+
+### 4. Project the senior year (optional)
+Add upcoming courses with the **Plan?** box checked (or use **+ Add planned (senior) course**). Then
+use the **View** toggle above the results to switch between **Completed only** and
+**Projected (incl. planned)** to see where the GPA is headed at graduation.
+
+### 5. Save or share
+- **Export results (CSV)** — the GPA/eligibility summary.
+- **Export courses (CSV)** — your course list, to reopen later.
+- **Print / Save as PDF** — a clean printout for a counselor or coach.
+
+> **Privacy:** your data is remembered only in *this browser on this device*. **Planning only:**
+> confirm your school's exact scale/weighting and its official NCAA-approved core-course list at the
+> NCAA Eligibility Center — official eligibility is determined by the NCAA/NAIA.
+
 ## Files
 
 | File | Purpose |
