@@ -132,10 +132,28 @@ Then fill the **CSV template** (one row per semester course) and **Import CSV…
 **Only have letter grades?** This tool uses **percentages** — enter a value inside that letter's band
 (e.g. A→95, B→85, C→75), or set your school's exact cutoffs in **Grading scale settings**.
 
-**Fastest path from a paper printout:** click **📋 Paste / AI import** → **Copy AI prompt**, paste it plus a
-photo/PDF of the transcript into ChatGPT, Claude, or Gemini, and paste the CSV it returns back into the box.
-You can also paste rows copied straight from a spreadsheet or school portal — the parser handles tabs, commas,
-or spaces and auto-detects the category and percent.
+**Fastest path from a paper printout (AI assist):**
+
+1. Click **📋 Paste / AI import** → **🤖 Copy AI prompt**.
+2. Open any AI chatbot that accepts file uploads — **ChatGPT** ([chat.openai.com](https://chat.openai.com)),
+   **Claude** ([claude.ai](https://claude.ai)), **Gemini** ([gemini.google.com](https://gemini.google.com)),
+   or **Microsoft Copilot** ([copilot.microsoft.com](https://copilot.microsoft.com)). All have free tiers.
+3. Attach the transcript (PDF, JPG, PNG, HEIC all work — drag-and-drop or use the 📎/+ icon) **and** paste
+   the prompt into the same message. Send it.
+4. The AI returns CSV. Select all of it, copy, and paste into the box in **Option B** → **Add to my courses**.
+5. **Spot-check the Category column** — especially that Band/PE/Health/Personal Finance are classified as
+   `Elective / Non-Core` (they must not count toward NCAA core GPA).
+
+If the AI misses something, just ask it in a follow-up: *"You skipped sophomore year — please add those
+courses too"* or *"Reclassify PE as Elective."* The in-app modal has a **Show step-by-step** toggle that
+walks through each step with screenshots of where to click in each chatbot.
+
+You can also paste rows copied straight from a spreadsheet or school portal — the parser handles tabs,
+commas, or spaces and auto-detects category and percent.
+
+**Privacy note:** when you upload a transcript to an AI, that data leaves your device. Most free chatbots
+use messages for training unless you turn off "improve the model" or use a temporary/incognito chat. Once
+the CSV is back in this calculator, everything stays in your browser.
 
 ## Files
 

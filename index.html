@@ -262,9 +262,60 @@
     <button class="close" onclick="closePaste()" title="Close" aria-label="Close">✕</button>
     <h2>Paste grades or use an AI</h2>
 
-    <h3>Option A — turn a photo/PDF into a CSV with an AI</h3>
-    <p>Best for a printed transcript or report card. Click below to copy a ready-made prompt, then paste it <b>plus a photo or PDF of the transcript</b> into ChatGPT, Claude, or Gemini. Paste the CSV it returns into the box below (or save it and use <b>Import CSV</b>).</p>
-    <p><button class="sec" onclick="copyAIPrompt()">🤖 Copy AI prompt</button> <span class="small" id="pasteMsg" role="status" aria-live="polite"></span></p>
+    <h3>Option A — turn a photo or PDF into CSV with an AI</h3>
+    <p class="small" style="color:var(--muted);margin-bottom:8px">The fastest way to handle a printed transcript or report card. Takes about 2 minutes end-to-end. Free options: ChatGPT, Claude, Gemini, Copilot — any chatbot that accepts file attachments.</p>
+
+    <p><button class="sec" onclick="copyAIPrompt()">🤖 Copy AI prompt</button> <button class="ghost" onclick="toggleAIDetails()" id="aiDetailsBtn" aria-expanded="false">▶ Show step-by-step</button> <span class="small" id="pasteMsg" role="status" aria-live="polite"></span></p>
+
+    <div id="aiDetails" style="display:none;border-left:3px solid var(--navy);padding:6px 14px;margin:8px 0;background:var(--soft);border-radius:6px">
+      <h4 style="margin:8px 0 4px;color:var(--navy);font-size:.95rem">1. Get the transcript in digital form</h4>
+      <ul style="margin:4px 0 8px;padding-left:20px;font-size:.88rem">
+        <li><b>Paper copy?</b> Use your phone camera or scanner. One clear photo per page is fine. Make sure all grades are readable — no glare, no fingers covering text.</li>
+        <li><b>PDF from the school?</b> Save it from your email or portal (the unofficial transcript PDF works great).</li>
+        <li><b>Screenshots?</b> Take one per term/year from the PowerSchool, Infinite Campus, or Skyward portal.</li>
+      </ul>
+
+      <h4 style="margin:8px 0 4px;color:var(--navy);font-size:.95rem">2. Open an AI chatbot that accepts files</h4>
+      <ul style="margin:4px 0 8px;padding-left:20px;font-size:.88rem">
+        <li><b>ChatGPT</b> (<a href="https://chat.openai.com" target="_blank" rel="noopener">chat.openai.com</a>) — free; click the <b>📎 paperclip</b> on the message box to attach.</li>
+        <li><b>Claude</b> (<a href="https://claude.ai" target="_blank" rel="noopener">claude.ai</a>) — free; drag & drop the file into the chat, or click the <b>📎 attach</b> button.</li>
+        <li><b>Google Gemini</b> (<a href="https://gemini.google.com" target="_blank" rel="noopener">gemini.google.com</a>) — free; click the <b>+ plus icon</b> next to the message box.</li>
+        <li><b>Microsoft Copilot</b> (<a href="https://copilot.microsoft.com" target="_blank" rel="noopener">copilot.microsoft.com</a>) — free; click the <b>📎 paperclip</b> icon.</li>
+      </ul>
+
+      <h4 style="margin:8px 0 4px;color:var(--navy);font-size:.95rem">3. Attach the transcript AND paste the prompt</h4>
+      <p style="font-size:.88rem;margin:4px 0 6px">In the same message:</p>
+      <ul style="margin:4px 0 8px;padding-left:20px;font-size:.88rem">
+        <li>Click the attach button and pick your transcript file (PDF, JPG, PNG, or HEIC all work).</li>
+        <li>Click <b>🤖 Copy AI prompt</b> above (it copies an exact, foolproof prompt that tells the AI what columns to use, how to categorize, and how to convert letter grades).</li>
+        <li>Paste the prompt into the message box (Ctrl+V or Cmd+V).</li>
+        <li>Press send. Wait 5–15 seconds.</li>
+      </ul>
+
+      <h4 style="margin:8px 0 4px;color:var(--navy);font-size:.95rem">4. Copy the CSV the AI returns</h4>
+      <p style="font-size:.88rem;margin:4px 0 6px">The AI will respond with rows that look like:</p>
+      <pre style="font-size:.78rem;background:var(--th-bg);padding:8px 10px;border-radius:5px;overflow:auto;margin:4px 0 6px">Term,Course,Category,Percent,CreditHours,Track,Planned
+Freshman S1,Algebra I,Math,86,1,Regular,No
+Freshman S1,English 9,English,88,1,Honors,No
+Freshman S1,Band,Elective / Non-Core,95,1,Regular,No</pre>
+      <p style="font-size:.88rem;margin:4px 0 6px">Select the whole CSV (drag, or triple-click then Ctrl+A) and copy it (Ctrl+C). Then paste it into the box below in <b>Option B</b>.</p>
+
+      <h4 style="margin:8px 0 4px;color:var(--navy);font-size:.95rem">5. Spot-check the result</h4>
+      <ul style="margin:4px 0 8px;padding-left:20px;font-size:.88rem">
+        <li><b>Number of rows looks right?</b> If you had 24 semester grades on the transcript, you should see ~24 rows.</li>
+        <li><b>Category column accurate?</b> Especially watch <b>Band, PE, Health, Personal Finance</b> — they must be "Elective / Non-Core" or they'll incorrectly count toward NCAA core GPA.</li>
+        <li><b>Letter grades only?</b> The prompt tells the AI to use A=95, B=85, C=75, D=65, F=55. If your school uses different cutoffs, adjust <b>Grading scale settings</b> in section 2.</li>
+        <li><b>Something missing or wrong?</b> Just ask the AI in a follow-up message: <i>"You skipped sophomore year — please add those courses too"</i> or <i>"Reclassify PE as Elective"</i>.</li>
+      </ul>
+
+      <h4 style="margin:8px 0 4px;color:var(--navy);font-size:.95rem">Tips for blurry photos or weird PDFs</h4>
+      <ul style="margin:4px 0 8px;padding-left:20px;font-size:.88rem">
+        <li>If the AI says "I can't read this clearly" — take a brighter, straight-on photo or zoom in to retake.</li>
+        <li>For multi-page transcripts, you can attach <b>multiple images</b> in one message (most chatbots accept up to 10).</li>
+        <li>If only letter grades are shown and you want precision, retake the photo of the legend/scale (e.g., "A = 94–100, B = 87–93") and the AI will use the midpoint.</li>
+        <li>Privacy note: when you send a file to an AI, that data leaves your device. Most free chatbots use it for training unless you turn off "improve the model" or use a temporary/incognito chat.</li>
+      </ul>
+    </div>
 
     <h3>Option B — paste rows directly</h3>
     <p class="small" style="color:var(--muted)">Paste from the AI, a spreadsheet, or a school portal — one course per line. Columns can be separated by tabs, commas, or spaces. Best order: <code>Term, Course, Category, Percent, CreditHours, Track</code>. At minimum each line needs a <b>course name</b> and a <b>0–100 percent</b>.</p>
@@ -660,6 +711,11 @@ Return just the CSV so I can paste or save it.`;
 function copyAIPrompt(){
   if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(AI_PROMPT).then(()=>pasteMsg('Prompt copied ✓ — paste it + a transcript photo into ChatGPT/Claude/Gemini.'),()=>pasteMsg('Copy failed — select the prompt manually.')); }
   else { pasteMsg('Clipboard unavailable in this browser.'); }
+}
+function toggleAIDetails(){
+  const d=document.getElementById('aiDetails'), b=document.getElementById('aiDetailsBtn');
+  if(d.style.display==='none'){ d.style.display='block'; b.textContent='▼ Hide step-by-step'; b.setAttribute('aria-expanded','true'); }
+  else { d.style.display='none'; b.textContent='▶ Show step-by-step'; b.setAttribute('aria-expanded','false'); }
 }
 function guessCat(t){ t=(t||'').toLowerCase();
   if(/\b(english|lit|literature|writing|composition|rhetoric)/.test(t)) return 'English';
