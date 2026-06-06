@@ -265,6 +265,10 @@
     <h3>Option A — turn a photo or PDF into CSV with an AI</h3>
     <p class="small" style="color:var(--muted);margin-bottom:8px">The fastest way to handle a printed transcript or report card. Takes about 2 minutes end-to-end. Free options: ChatGPT, Claude, Gemini, Copilot — any chatbot that accepts file attachments.</p>
 
+    <div style="background:var(--amberbg);border-left:3px solid var(--amber);color:var(--ink);padding:8px 12px;margin:8px 0;border-radius:5px;font-size:.85rem">
+      <b>⚠ If your transcript shows internal codes (like 1, 2, 3, 4, 5 with +/-) instead of letter grades or percentages</b>, the AI may misread them. Our prompt now tells the AI to detect the scale and state its assumption at the top of the CSV (look for a <code>"# Detected scale:"</code> line — you'll see it after importing). <b>Always spot-check 2-3 grades</b> against the transcript before trusting the GPA. <b>Most reliable source:</b> your child's <i>report cards</i>, which usually print actual percentages.
+    </div>
+
     <p><button class="sec" onclick="copyAIPrompt()">🤖 Copy AI prompt</button> <button class="ghost" onclick="toggleAIDetails()" id="aiDetailsBtn" aria-expanded="false">▶ Show step-by-step</button> <span class="small" id="pasteMsg" role="status" aria-live="polite"></span></p>
 
     <div id="aiDetails" style="display:none;border-left:3px solid var(--navy);padding:6px 14px;margin:8px 0;background:var(--soft);border-radius:6px">
@@ -304,12 +308,15 @@ Freshman S1,Band,Elective / Non-Core,95,1,Regular,No</pre>
         <li><b>Download a .csv file directly from the AI</b> — ChatGPT will often offer a downloadable <code>my_grades.csv</code> in its response (a small file/download icon). Claude shows it as a CSV "artifact" you can download. Once you have the file, use <b>Import CSV…</b> in the calculator instead.</li>
       </ul>
 
-      <h4 style="margin:8px 0 4px;color:var(--navy);font-size:.95rem">5. Spot-check the result</h4>
+      <h4 style="margin:8px 0 4px;color:var(--navy);font-size:.95rem">5. Spot-check the result (do this!)</h4>
       <ul style="margin:4px 0 8px;padding-left:20px;font-size:.88rem">
+        <li><b>Check the "# Detected scale" line at the top.</b> The AI now states what grade scale it assumed (e.g., <code># Detected scale: Numeric codes 1-5</code>). If that doesn't match your transcript, the percentages will be wrong — tell the AI: <i>"Use scale (b) standard letters"</i> or whichever applies, and regenerate.</li>
+        <li><b>Pick 2-3 courses and verify the percent matches the transcript</b> — especially courses where the grade is in the middle (B/C range). If the AI mis-detected the scale, this is where you'll catch it.</li>
         <li><b>Number of rows looks right?</b> If you had 24 semester grades on the transcript, you should see ~24 rows.</li>
         <li><b>Category column accurate?</b> Especially watch <b>Band, PE, Health, Personal Finance</b> — they must be "Elective / Non-Core" or they'll incorrectly count toward NCAA core GPA.</li>
-        <li><b>Letter grades only?</b> The prompt tells the AI to use A=95, B=85, C=75, D=65, F=55. If your school uses different cutoffs, adjust <b>Grading scale settings</b> in section 2.</li>
-        <li><b>Something missing or wrong?</b> Just ask the AI in a follow-up message: <i>"You skipped sophomore year — please add those courses too"</i> or <i>"Reclassify PE as Elective"</i>.</li>
+        <li><b>School uses numeric codes 1-5?</b> Many districts do (1=highest, 5=fail). The prompt now defaults to the common mapping (1+ ≈ 99%, 1 ≈ 95%, 2 ≈ 87%, 3 ≈ 80%, 4 ≈ 72%, 5 = fail). If your school's scale is different (e.g., the cutoffs are tighter), adjust <b>Grading scale settings</b> in section 2 so the letter grades and GPA still come out right.</li>
+        <li><b>Most reliable source if AI misreads:</b> use a recent <b>report card</b> instead — those usually print actual numeric percentages next to each course.</li>
+        <li><b>Something missing or wrong?</b> Just ask the AI in a follow-up: <i>"You skipped sophomore year — please add those courses too"</i> or <i>"Use scale (c) GPA points"</i>.</li>
       </ul>
 
       <h4 style="margin:8px 0 4px;color:var(--navy);font-size:.95rem">Tips for blurry photos or weird PDFs</h4>
@@ -323,7 +330,7 @@ Freshman S1,Band,Elective / Non-Core,95,1,Regular,No</pre>
 
     <h3>Option B — paste rows directly</h3>
     <p class="small" style="color:var(--muted)">Paste from the AI, a spreadsheet, or a school portal — one course per line. Columns can be separated by tabs, commas, or spaces. Best order: <code>Term, Course, Category, Percent, CreditHours, Track</code>. At minimum each line needs a <b>course name</b> and a <b>0–100 percent</b>.</p>
-    <textarea id="pasteBox" rows="8" style="width:100%;font-family:monospace;font-size:.85rem" placeholder="Freshman S1, Algebra I, Math, 86, 1, Regular&#10;Freshman S1, English 9, English, 88, 1, Honors&#10;Freshman S1, Band, Elective / Non-Core, 95, 1, Regular" aria-label="Paste grade rows here"></textarea>
+    <textarea id="pasteBox" rows="9" style="width:100%;font-family:monospace;font-size:.85rem" placeholder="# Detected scale: Standard letters — A/B/C/D/F midpoints   (this line is optional; AI adds it automatically)&#10;Term,Course,Category,Percent,CreditHours,Track,Planned&#10;Freshman S1,Algebra I,Math,86,1,Regular,No&#10;Freshman S1,English 9,English,88,1,Honors,No&#10;Freshman S1,Band,Elective / Non-Core,95,1,Regular,No" aria-label="Paste grade rows here"></textarea>
     <p style="text-align:center;margin-top:14px">
       <button onclick="parsePasted()">Add to my courses</button>
       <button class="sec" onclick="downloadPastedCSV()" title="Save the text in the box above as a .csv file you can keep or re-import later">💾 Save as CSV file</button>
@@ -700,36 +707,76 @@ function loadFromHash(){
 function openPaste(){ document.getElementById('pasteModal').classList.add('open'); document.getElementById('pasteBox').focus(); }
 function closePaste(){ document.getElementById('pasteModal').classList.remove('open'); }
 function pasteMsg(m){ const e=document.getElementById('pasteMsg'); if(e){ e.textContent=m; } }
-const AI_PROMPT=`I'm attaching a photo/PDF of a high school transcript or report card. Convert it into CSV for a GPA calculator.
+const AI_PROMPT=`I'm attaching a high school transcript or report card. Convert it into CSV for a GPA calculator.
 
-Output ONLY the CSV with this exact header and column order:
+STEP 1 — IDENTIFY THE GRADE SCALE (this is the most important step)
+
+Different schools use very different scales. DO NOT assume A/B/C/D — read what's actually printed and figure out the scale BEFORE filling in any percentages.
+
+First, look for a "Grade Scale" / "Key" / "Legend" / "Marking Code" section on the transcript. If one exists, USE IT EXACTLY.
+
+If no legend is printed, identify which of these patterns matches the grades on the page:
+
+(a) PERCENTAGE: numbers 0-100 next to courses (e.g., "88", "92.5") — use them as-is.
+
+(b) STANDARD LETTERS: A, B, C, D, F with optional +/- — use midpoints:
+    A+=97, A=95, A-=92, B+=88, B=85, B-=82, C+=78, C=75, C-=72, D+=68, D=65, D-=62, F=55
+
+(c) GPA POINTS on a 4.0 scale: numbers like 4.0, 3.7, 3.3, 3.0, 2.7... — multiply by 25 (4.0→100, 3.0→85, 2.0→75, 1.0→65, 0→55).
+
+(d) NUMERIC CODES 1-5 with +/- (US-style proficiency/marking codes, common at many districts).
+    *** THIS IS NOT THE SAME AS GPA POINTS. *** 1 = best, 5 = worst (failing).
+    DEFAULT MAPPING when no legend is shown:
+      1+ = A+ (99)   1 = A (95)   1- = A- (93)
+      2+ = B+ (90)   2 = B (87)   2- = B- (85)
+      3+ = C+ (83)   3 = C (80)   3- = C- (78)
+      4+ = D+ (75)   4 = D (72)   4- = D- (70)
+      5 = F (55)
+    This is the scale used by many K-12 districts (e.g., Elkhorn NE).
+    If you see codes 1-5, USE THIS MAPPING, NOT the standard-letter midpoints.
+
+(e) IB-style 1-7 (1 = lowest, 7 = highest): 7=98, 6=92, 5=85, 4=77, 3=68, 2=58, 1=50.
+
+(f) GERMAN/EUROPEAN 1-6 (1 = best, 6 = fail): 1=95, 2=85, 3=75, 4=65, 5=55, 6=45.
+
+If the scale is genuinely ambiguous, DO NOT GUESS. Instead, stop and ask the user which scale their school uses. Better to ask once than fabricate percentages.
+
+STEP 2 — STATE YOUR ASSUMPTION (so the user can verify)
+
+Before the CSV, output a single comment line at the very top (the calculator's parser will ignore it):
+# Detected scale: <one of: Percentage | Standard letters | GPA points | Numeric codes 1-5 | IB 1-7 | German 1-6 | OTHER> — <one-sentence explanation of how you read it>
+
+STEP 3 — OUTPUT THE CSV
+
+Use this exact header and column order:
 Term,Course,Category,Percent,CreditHours,Track,Planned
 
-IMPORTANT — exclude these rows entirely (do NOT include them in the CSV):
+EXCLUDE these rows entirely (do NOT include them in the CSV):
 - Study Hall, Guided Study, Study Skills, Resource Period
 - Advisory, Homeroom, Seminar, FLEX, SEL, Office Aide, Teacher Aide
-- Lunch periods, free periods, "Pass / Fail" only courses
-- Any course that shows no real letter or numeric grade (e.g., a blank, "P", "F", "I", "W", "WP", "M", "AU", "NC", "—", "N/A")
-- Any course with 0 credit AND no graded percent
+- Lunch periods, free periods, Pass/Fail-only courses
+- Any course that shows no real grade (blank, "P", "F", "I", "W", "WP", "M", "AU", "NC", "—", "N/A")
+- Any course with 0 credit AND no graded value
 - Withdrawn / dropped courses
-When in doubt, skip the row. Don't invent grades.
+When in doubt, skip the row. NEVER invent a grade.
 
-For courses you DO include, follow these rules:
-- One row per semester grade (S1, S2, Q1–Q4, etc.). If only final/year grades are shown, one row per course is fine.
-- Term: a short label like "Freshman S1".
-- Course: the class name as printed.
-- Category: pick exactly one of: English, Math, Science, Social Science, Foreign Language, Other Academic, Elective / Non-Core.
-  Use "Elective / Non-Core" for graded electives like Band, Choir, PE/Gym, Health, Personal Finance, Yearbook, Drama, Art, Driver's Ed — they affect the overall GPA but NOT the NCAA core GPA.
-- Percent: the numeric percent grade (e.g., 88). If only a letter grade is shown, estimate the midpoint: A=95, B=85, C=75, D=65, F=55. If only +/- letter shown, adjust ±2 (e.g., B+=88, B-=82).
-- CreditHours: the course's credit/units as printed (use 1 if unknown; use 0 if it was failed for no credit).
-- Track: Regular, Honors, or AP (AP for AP/Advanced Placement / IB-HL; Honors for Honors/H/Advanced; otherwise Regular).
-- Planned: No for completed courses; Yes only for future/in-progress courses.
+For included courses:
+- One row per semester (S1, S2, Q1–Q4, etc.). If only year-end grades are shown, one row per course is fine.
+- Term: short label like "Freshman S1".
+- Course: name as printed.
+- Category: exactly one of: English, Math, Science, Social Science, Foreign Language, Other Academic, Elective / Non-Core. Use "Elective / Non-Core" for graded electives like Band, Choir, PE/Gym, Health, Personal Finance, Yearbook, Drama, Art, Driver's Ed (these affect overall GPA but NOT NCAA core GPA).
+- Percent: numeric 0-100, using the scale you identified in Step 1. Do not round to a single decimal-of-five if the source has finer precision; otherwise use whole numbers.
+- CreditHours: as printed; 1 if unknown; 0 if failed for no credit.
+- Track: Regular | Honors | AP (AP for AP / Advanced Placement / IB-HL; Honors for Honors / H / Advanced; otherwise Regular).
+- Planned: No for completed courses; Yes only for future/in-progress.
 
-Output the CSV in TWO ways so it's easy to use:
-1. Show the CSV inline as plain text inside a code block so I can copy it.
-2. If you can attach files, also provide it as a downloadable .csv file named "my_grades.csv" so I can save it directly to my device. (ChatGPT: use Python/data-analysis to write the file; Claude: create a CSV artifact; otherwise just show the inline text.)
+STEP 4 — DELIVERY
 
-No extra commentary outside the CSV.`;
+Output TWO ways:
+1. CSV inline in a fenced code block (with the leading "# Detected scale" comment) so I can copy it.
+2. If you can attach files, also provide a downloadable "my_grades.csv". (ChatGPT: use Python/data-analysis to write the file; Claude: create a CSV artifact; otherwise inline text only.)
+
+No commentary outside the code block.`;
 function copyAIPrompt(){
   if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(AI_PROMPT).then(()=>pasteMsg('Prompt copied ✓ — paste it + a transcript photo into ChatGPT/Claude/Gemini.'),()=>pasteMsg('Copy failed — select the prompt manually.')); }
   else { pasteMsg('Clipboard unavailable in this browser.'); }
@@ -765,7 +812,15 @@ function parsePasted(){
   let text=document.getElementById('pasteBox').value;
   // Strip markdown code fences that AIs often add (e.g., ```csv ... ```)
   text=text.replace(/```\w*\s*\n?/g,'').replace(/\n?```\s*$/g,'');
-  const lines=text.replace(/\r/g,'').split('\n').map(l=>l.trim()).filter(l=>l && !/^```/.test(l));
+  const rawLines=text.replace(/\r/g,'').split('\n').map(l=>l.trim()).filter(l=>l && !/^```/.test(l));
+  // Pick out a "# Detected scale: ..." comment line if present and pass it to the user as a heads-up
+  let scaleMsg='';
+  const lines=[];
+  for(const l of rawLines){
+    if(/^#\s*detected scale\s*:/i.test(l)){ scaleMsg=l.replace(/^#\s*/,''); continue; }
+    if(/^#/.test(l)) continue;   // skip any other comment lines
+    lines.push(l);
+  }
   if(!lines.length){ pasteMsg('Paste some rows first.'); return; }
   let start=0;
   if(/\b(course|term|percent|category|track)\b/i.test(lines[0]) && !/\b\d{2,3}\b/.test(lines[0])) start=1; // header
@@ -793,7 +848,12 @@ function parsePasted(){
   }
   if(!add.length){ pasteMsg('No grade rows found. Each line needs a course name and a 0–100 percent. (Study hall / advisory / homeroom periods are skipped.)'); return; }
   data=data.concat(add); render(); closePaste();
-  profMsg(add.length+' course'+(add.length>1?'s':'')+' added'+(skipped?' ('+skipped+' line(s) skipped — non-graded periods or unrecognized rows)':'')+' — review the Category column for NCAA accuracy.');
+  const base = add.length+' course'+(add.length>1?'s':'')+' added'+(skipped?' ('+skipped+' line(s) skipped — non-graded periods or unrecognized rows)':'');
+  if(scaleMsg){
+    profMsg(base+' — ⚠ AI assumed: "'+scaleMsg+'" — please spot-check 2-3 grades against the transcript before trusting the GPA.');
+  } else {
+    profMsg(base+' — review the Category column for NCAA accuracy.');
+  }
 }
 
 /* ---------- College search & match (U.S. Dept of Education College Scorecard) ---------- */
