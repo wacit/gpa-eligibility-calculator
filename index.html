@@ -100,6 +100,11 @@
   .badge.target{background:var(--amberbg);color:var(--amber);border:1px solid var(--amber)}
   .badge.reach{background:var(--redbg);color:var(--red);border:1px solid var(--red)}
   .badge.divb{background:var(--navy);color:#fff;border:1px solid var(--navy)}
+  .star{background:none;border:none;cursor:pointer;font-size:1.15rem;line-height:1;padding:0 2px;color:#c8a200}
+  .star:hover{filter:brightness(1.1)}
+  .cmp{width:100%;border-collapse:collapse;font-size:.85rem}
+  .cmp th,.cmp td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+  .cmp th{background:var(--th-bg);color:var(--navy)}
 </style>
 </head>
 <body>
@@ -118,7 +123,7 @@
   </div>
 </header>
 
-<div class="modal" id="helpModal" onclick="if(event.target===this)closeHelp()">
+<div class="modal" id="helpModal" role="dialog" aria-modal="true" aria-label="How to use this calculator" onclick="if(event.target===this)closeHelp()">
   <div class="box">
     <button class="close" onclick="closeHelp()" title="Close">✕</button>
     <h2>How to use this calculator</h2>
@@ -131,6 +136,7 @@
       <li><b>Import a spreadsheet</b> — click <span class="tag">Download CSV template</span>, fill it in Excel/Google Sheets, then <span class="tag">Import CSV…</span>. Not sure where your grades are? Click <span class="tag">📥 Where's my data?</span> for how to get them out of PowerSchool, Infinite Campus, Skyward, and more.</li>
       <li><b>Try it first</b> — click <span class="tag">Load sample data</span> to see a worked example, then <span class="tag">Clear all</span> when ready.</li>
     </ul>
+    <p><b>Save or move your work:</b> <span class="tag">💾 Save profile</span> downloads everything (courses, scores, settings) as a file; <span class="tag">📂 Load profile</span> restores it on any device; <span class="tag">🔗 Copy share link</span> makes a link you can send to a counselor or open elsewhere (the data rides in the link — still nothing sent to a server).</p>
     <p>What each column means:</p>
     <ul>
       <li><b>Term</b> — e.g. <code>Freshman S1</code>. Just a label.</li>
@@ -145,8 +151,8 @@
     <h3>2 · Match your school's grading scale</h3>
     <p>Open <b>Grading scale settings</b> and set the cutoffs to match your school exactly. Defaults are the common 7-point (A≥93) and 10-point (A≥90) scales. You can also set the Honors/AP bonus and the NCAA/NAIA pass thresholds here.</p>
 
-    <h3>3 · Add test scores (optional)</h3>
-    <p>In the <b>Test scores</b> card, enter the student's <b>ACT composite</b> and/or <b>SAT total</b>. These feed the <b>NAIA</b> check below. <i>Note:</i> the <b>NCAA dropped ACT/SAT</b> from DI/DII initial eligibility (permanent since 2023), so scores don't change the NCAA result.</p>
+    <h3>3 · Add test scores &amp; class rank (optional)</h3>
+    <p>In the <b>Test scores &amp; class rank</b> card, enter the student's <b>ACT composite</b> and/or <b>SAT total</b>, and optionally the <b>class rank</b> (top __% of class). These feed the <b>NAIA</b> "2 of 3" check below. Have only one test? The app shows a <b>SAT↔ACT concordance</b> estimate with a one-click "use it." <i>Note:</i> the <b>NCAA dropped ACT/SAT</b> from DI/DII initial eligibility (permanent since 2023), so scores don't change the NCAA result.</p>
 
     <h3>4 · Read the results</h3>
     <ul>
@@ -159,7 +165,7 @@
     <p>Add upcoming courses with the <b>Plan?</b> box checked (or use <span class="tag">+ Add planned (senior) course</span>). Then use the <b>View</b> toggle above the results to switch between <b>Completed only</b> and <b>Projected (incl. planned)</b> to see where the GPA is headed at graduation.</p>
 
     <h3>6 · Explore colleges (optional)</h3>
-    <p>In the <b>College search &amp; match</b> card, search by school name, state, and/or major, and narrow by <b>NCAA/NAIA division</b> (D-I / D-II / D-III / NAIA) and by a <b>men's or women's sport</b> the school sponsors (e.g. only NAIA schools in Ohio with men's soccer). Each result is labeled with its <b>division</b> and shows <b>cost</b> (net price &amp; tuition), <b>admission rate</b>, and the school's <b>SAT/ACT middle-50%</b> ranges, with a link to the school. Use the <b>Show 25 / 50 / 100</b> selector to see more results. <b>Note:</b> filters combine — a school must match <i>all</i> of them, so to find one specific school type its <b>name</b> and leave the others on "Any"; pick a <b>state</b> first when browsing by division/sport. If you've entered ACT/SAT above, you'll also get an <b>academic match</b> badge — <span class="tag likely">Likely</span> <span class="tag target">Target</span> <span class="tag reach">Reach</span> — based on how your scores compare to that school's ranges and selectivity. It's an <i>estimate</i>, not a guarantee (recruited athletes may get extra admissions support). Data is the federal College Scorecard; only your search terms are sent — your scores stay in your browser.</p>
+    <p>In the <b>College search &amp; match</b> card, search by school name, state, and/or major, and narrow by <b>NCAA/NAIA division</b> (D-I / D-II / D-III / NAIA) and by a <b>men's or women's sport</b> the school sponsors (e.g. only NAIA schools in Ohio with men's soccer). Each result is labeled with its <b>division</b> and shows <b>cost</b> (net price &amp; tuition), <b>admission rate</b>, and the school's <b>SAT/ACT middle-50%</b> ranges, with a link to the school. <b>Star (☆)</b> schools to add them to <b>Compare</b> — a side-by-side table of cost, admission rate, division, and your match. Use the <b>Show 25 / 50 / 100</b> selector to see more results. <b>Note:</b> filters combine — a school must match <i>all</i> of them, so to find one specific school type its <b>name</b> and leave the others on "Any"; pick a <b>state</b> first when browsing by division/sport. If you've entered ACT/SAT above, you'll also get an <b>academic match</b> badge — <span class="tag likely">Likely</span> <span class="tag target">Target</span> <span class="tag reach">Reach</span> — based on how your scores compare to that school's ranges and selectivity. It's an <i>estimate</i>, not a guarantee (recruited athletes may get extra admissions support). Data is the federal College Scorecard; only your search terms are sent — your scores stay in your browser.</p>
 
     <h3>7 · Save or share</h3>
     <ul>
@@ -177,7 +183,7 @@
   </div>
 </div>
 
-<div class="modal" id="importModal" onclick="if(event.target===this)closeImport()">
+<div class="modal" id="importModal" role="dialog" aria-modal="true" aria-label="Getting your grades out of your school's system" onclick="if(event.target===this)closeImport()">
   <div class="box">
     <button class="close" onclick="closeImport()" title="Close">✕</button>
     <h2>Getting your grades out of your school's system</h2>
@@ -221,6 +227,16 @@
   </div>
 </div>
 
+<div class="modal" id="compareModal" role="dialog" aria-modal="true" aria-label="Compare saved colleges" onclick="if(event.target===this)closeCompare()">
+  <div class="box" style="max-width:920px">
+    <button class="close" onclick="closeCompare()" title="Close" aria-label="Close">✕</button>
+    <h2>Compare saved colleges</h2>
+    <p class="small" style="color:var(--muted)">Schools you've starred. The academic match reflects the ACT/SAT you entered.</p>
+    <div id="compareBody" style="overflow:auto"></div>
+    <p style="text-align:center;margin-top:16px"><button onclick="clearFavs()" class="ghost">Clear all stars</button> <button onclick="closeCompare()">Close</button></p>
+  </div>
+</div>
+
 <div class="wrap">
 
   <!-- STEP 1: data -->
@@ -235,6 +251,13 @@
       <button class="ghost" onclick="downloadTemplate()">Download CSV template</button>
       <button class="ghost" onclick="loadSample()">Load sample data</button>
       <button class="ghost" onclick="clearAll()">Clear all</button>
+    </div>
+    <div class="row noprint" style="margin-bottom:10px">
+      <button class="sec" onclick="saveProfile()" aria-label="Save profile to a file">💾 Save profile</button>
+      <button class="sec" onclick="document.getElementById('profin').click()" aria-label="Load profile from a file">📂 Load profile</button>
+      <input id="profin" type="file" accept=".json,application/json" style="display:none" onchange="loadProfile(this)">
+      <button class="ghost" onclick="copyShareLink()" aria-label="Copy a shareable link">🔗 Copy share link</button>
+      <span class="small" id="profMsg" role="status" aria-live="polite"></span>
     </div>
     <div class="tablewrap">
       <table id="grid">
@@ -283,13 +306,15 @@
 
   <!-- Test scores -->
   <div class="card">
-    <h2>🎯 Test scores <span class="small" style="font-weight:normal;color:var(--muted)">(optional — used for NAIA)</span></h2>
+    <h2>🎯 Test scores &amp; class rank <span class="small" style="font-weight:normal;color:var(--muted)">(optional — used for NAIA)</span></h2>
     <div class="row" style="gap:20px;align-items:flex-end">
-      <label class="small">ACT composite (1–36)<br><input type="number" id="act" min="1" max="36" placeholder="—" style="width:96px" oninput="saveTests();compute()"></label>
-      <label class="small">SAT total (400–1600)<br><input type="number" id="sat" min="400" max="1600" step="10" placeholder="—" style="width:116px" oninput="saveTests();compute()"></label>
+      <label class="small">ACT composite (1–36)<br><input type="number" id="act" min="1" max="36" placeholder="—" style="width:96px" aria-label="ACT composite score" oninput="saveTests();compute()"></label>
+      <label class="small">SAT total (400–1600)<br><input type="number" id="sat" min="400" max="1600" step="10" placeholder="—" style="width:116px" aria-label="SAT total score" oninput="saveTests();compute()"></label>
+      <label class="small">Class rank — top __% of class<br><input type="number" id="rank" min="1" max="100" placeholder="—" style="width:96px" aria-label="Class rank, top percent of class" oninput="saveTests();compute()"></label>
       <span id="testLeg" style="margin-bottom:4px"></span>
     </div>
-    <p class="note">NAIA's test leg is met with <b>ACT ≥ 18</b> or <b>SAT ≥ 970</b> (SAT = Evidence-Based Reading/Writing + Math). <b>The NCAA no longer uses ACT/SAT</b> for DI/DII initial eligibility (test-optional became permanent in 2023), so scores don't change the NCAA result.</p>
+    <p class="note" id="concordNote" style="margin-top:6px"></p>
+    <p class="note">NAIA's "2 of 3": <b>overall GPA ≥ 2.3</b>, <b>ACT ≥ 18 / SAT ≥ 970</b> (SAT = Evidence-Based Reading/Writing + Math), or <b>top-50% class rank</b>. <b>The NCAA no longer uses ACT/SAT</b> for DI/DII initial eligibility (test-optional became permanent in 2023), so scores don't change the NCAA result.</p>
   </div>
 
   <!-- STEP 3: results -->
@@ -334,7 +359,7 @@
           <tr><td class="l">7-point</td><td id="na7">–</td><td id="na7g"></td><td id="na7b"></td></tr>
           <tr><td class="l">10-point</td><td id="na10" class="up">–</td><td id="na10g"></td><td id="na10b"></td></tr>
         </table>
-        <p class="note">Meet <b>2 of 3</b>: overall GPA ≥ <span id="naiaMinL">2.3</span>, test leg (ACT ≥ 18 / SAT ≥ 970), or top-50% class rank. Enter a test score above to evaluate the test leg; class rank isn’t entered here, so it’s shown as the remaining option.</p>
+        <p class="note">Meet <b>2 of 3</b>: overall GPA ≥ <span id="naiaMinL">2.3</span>, test leg (ACT ≥ 18 / SAT ≥ 970), or top-50% class rank. Fill in test score and/or class rank above to evaluate those legs.</p>
       </div>
     </div>
     <div class="row noprint" style="margin-top:14px">
@@ -348,13 +373,14 @@
   <div class="card">
     <h2>🎓 College search &amp; match <span class="small" style="font-weight:normal;color:var(--muted)">(majors · cost · academic fit)</span></h2>
     <div class="row noprint" style="gap:10px">
-      <input id="cSchool" placeholder="School name (e.g. Ohio State)" style="flex:1;min-width:160px" onkeydown="if(event.key==='Enter')searchColleges()">
-      <select id="cState" style="width:120px"></select>
-      <select id="cMajor" style="width:190px"></select>
-      <select id="cDivision" style="width:150px"></select>
-      <select id="cSport" style="width:175px"></select>
-      <select id="cResultCount" style="width:120px" onchange="searchColleges()"></select>
+      <input id="cSchool" placeholder="School name (e.g. Ohio State)" style="flex:1;min-width:160px" onkeydown="if(event.key==='Enter')searchColleges()" aria-label="School name to search">
+      <select id="cState" style="width:120px" aria-label="Filter by state"></select>
+      <select id="cMajor" style="width:190px" aria-label="Filter by major"></select>
+      <select id="cDivision" style="width:150px" aria-label="Filter by NCAA/NAIA division"></select>
+      <select id="cSport" style="width:175px" aria-label="Filter by sport"></select>
+      <select id="cResultCount" style="width:120px" onchange="searchColleges()" aria-label="Number of results to show"></select>
       <button class="sec" onclick="searchColleges()">Search</button>
+      <button class="sec" id="cCompareBtn" onclick="openCompare()" style="display:none">⭐ Compare (0)</button>
     </div>
     <p class="note">Live data from the U.S. Dept. of Education <b>College Scorecard</b>; NCAA/NAIA <b>division</b> &amp; <b>sport</b> data from the federal <b>EADA</b> survey (2024-25). The <b>academic match</b> uses the ACT/SAT you entered above — your grades/scores stay in your browser; only the school search terms are sent. Tip: pick a <b>state</b> (or name) to browse, then narrow by division or sport.</p>
     <div id="cResults" style="margin-top:8px"></div>
@@ -380,14 +406,14 @@
 
 <script>
 document.getElementById('yr').textContent = new Date().getFullYear();
-function applyTheme(t){ document.documentElement.setAttribute('data-theme',t); try{localStorage.setItem('theme',t);}catch(e){} const b=document.getElementById('themeBtn'); if(b) b.textContent=t==='dark'?'☀️ Light':'🌙 Dark'; const m=document.querySelector('meta[name=theme-color]'); if(m) m.setAttribute('content', t==='dark'?'#0f141a':'#1f4e78'); }
+function applyTheme(t){ document.documentElement.setAttribute('data-theme',t); try{localStorage.setItem('theme',t);}catch(e){} const b=document.getElementById('themeBtn'); if(b){ b.textContent=t==='dark'?'☀️ Light':'🌙 Dark'; b.setAttribute('aria-label', t==='dark'?'Switch to light mode':'Switch to dark mode'); b.setAttribute('aria-pressed', t==='dark'); } const m=document.querySelector('meta[name=theme-color]'); if(m) m.setAttribute('content', t==='dark'?'#0f141a':'#1f4e78'); }
 function toggleTheme(){ const cur=document.documentElement.getAttribute('data-theme')==='dark'?'dark':'light'; applyTheme(cur==='dark'?'light':'dark'); }
 applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'dark':'light');
 function openHelp(){ document.getElementById('helpModal').classList.add('open'); }
 function closeHelp(){ document.getElementById('helpModal').classList.remove('open'); }
 function openImport(){ document.getElementById('importModal').classList.add('open'); }
 function closeImport(){ document.getElementById('importModal').classList.remove('open'); }
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeHelp(); closeImport(); } });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeHelp(); closeImport(); closeCompare(); } });
 try{ if(!localStorage.getItem('seenHelp')){ openHelp(); localStorage.setItem('seenHelp','1'); } }catch(e){}
 const CORE_CATS = ["English","Math","Science","Social Science","Foreign Language","Other Academic"];
 const CATS = [...CORE_CATS, "Elective / Non-Core"];
@@ -419,16 +445,17 @@ function render(){
     const l7=d.pct!==""?letter(+d.pct,scale7()):"";
     const l10=d.pct!==""?letter(+d.pct,scale10()):"";
     const up=(l7&&l10&&l7!==l10)?'class="up"':'';
+    const rn=i+1;
     return `<tr>
-      <td class="l"><input value="${esc(d.term)}" oninput="upd(${i},'term',this.value)"></td>
-      <td class="l"><input value="${esc(d.course)}" oninput="upd(${i},'course',this.value)"></td>
-      <td><select onchange="upd(${i},'cat',this.value)">${opt(CATS,d.cat)}</select></td>
-      <td><input class="pct" type="number" value="${d.pct}" oninput="upd(${i},'pct',this.value)"></td>
-      <td><input class="pct" type="number" step="0.5" value="${d.hrs}" oninput="upd(${i},'hrs',this.value)"></td>
-      <td><select onchange="upd(${i},'track',this.value)">${opt(TRACKS,d.track)}</select></td>
+      <td class="l"><input value="${esc(d.term)}" oninput="upd(${i},'term',this.value)" aria-label="Term, row ${rn}"></td>
+      <td class="l"><input value="${esc(d.course)}" oninput="upd(${i},'course',this.value)" aria-label="Course name, row ${rn}"></td>
+      <td><select onchange="upd(${i},'cat',this.value)" aria-label="Category, row ${rn}">${opt(CATS,d.cat)}</select></td>
+      <td><input class="pct" type="number" value="${d.pct}" oninput="upd(${i},'pct',this.value)" aria-label="Percent grade, row ${rn}"></td>
+      <td><input class="pct" type="number" step="0.5" value="${d.hrs}" oninput="upd(${i},'hrs',this.value)" aria-label="Credit hours, row ${rn}"></td>
+      <td><select onchange="upd(${i},'track',this.value)" aria-label="Course track, row ${rn}">${opt(TRACKS,d.track)}</select></td>
       <td>${l7}</td><td ${up}>${l10}</td>
-      <td class="noprint"><input type="checkbox" ${d.planned?'checked':''} onchange="updPlanned(${i},this.checked)" style="width:auto"></td>
-      <td class="noprint"><button class="del" onclick="delRow(${i})">✕</button></td>
+      <td class="noprint"><input type="checkbox" ${d.planned?'checked':''} onchange="updPlanned(${i},this.checked)" style="width:auto" aria-label="Planned senior-year course, row ${rn}"></td>
+      <td class="noprint"><button class="del" onclick="delRow(${i})" aria-label="Delete row ${rn}">✕</button></td>
     </tr>`;
   }).join('');
   compute(); save();
@@ -470,10 +497,12 @@ function compute(){
   const unitsHave=Math.max(n7u,n10u);
   set('ncaaUnitsNote', `${unitsHave.toFixed(1)} core units entered (16 required by graduation). ` + (unitsHave<16?'More core courses still needed.':'Meets the 16-unit count.'));
 
-  // NAIA: overall (unweighted) GPA + ACT/SAT "2 of 3" rule
-  const naiaMin=num('naiaMin'), act=num('act'), sat=num('sat');
+  // NAIA: overall (unweighted) GPA + ACT/SAT + class rank "2 of 3" rule
+  const naiaMin=num('naiaMin'), act=num('act'), sat=num('sat'), rank=num('rank');
   const testEntered = act>0 || sat>0;
   const testPass = act>=18 || sat>=970;
+  const rankEntered = rank>0;
+  const rankPass = rank>0 && rank<=50;
   set('naiaMinL', naiaMin);
   const tl=document.getElementById('testLeg');
   if(tl){
@@ -481,9 +510,16 @@ function compute(){
     else { const parts=[]; if(act)parts.push('ACT '+act); if(sat)parts.push('SAT '+sat);
       tl.innerHTML=`<span class="badge ${testPass?'pass':'fail'}">Test leg: ${testPass?'MET':'NOT met'} · ${parts.join(' / ')}</span>`; }
   }
+  // SAT<->ACT concordance helper
+  const cn=document.getElementById('concordNote');
+  if(cn){
+    if(sat>0 && act<=0) cn.innerHTML=`💡 An SAT of <b>${sat}</b> is roughly an <b>ACT ${satToAct(sat)}</b>. <a href="#" onclick="document.getElementById('act').value=${satToAct(sat)};saveTests();compute();return false">Use it</a>`;
+    else if(act>0 && sat<=0) cn.innerHTML=`💡 An ACT of <b>${act}</b> is roughly an <b>SAT ${actToSat(act)}</b>. <a href="#" onclick="document.getElementById('sat').value=${actToSat(act)};saveTests();compute();return false">Use it</a>`;
+    else cn.innerHTML='';
+  }
   set('na7', oh?f(o7u/oh):'–'); set('na10', oh?f(o10u/oh):'–');
-  naiaRow('na7g','na7b', oh?o7u/oh:null, naiaMin, testEntered, testPass);
-  naiaRow('na10g','na10b', oh?o10u/oh:null, naiaMin, testEntered, testPass);
+  naiaRow('na7g','na7b', oh?o7u/oh:null, naiaMin, testEntered, testPass, rankEntered, rankPass);
+  naiaRow('na10g','na10b', oh?o10u/oh:null, naiaMin, testEntered, testPass, rankEntered, rankPass);
 
   refreshCollegeMatch();
   const vi=document.getElementById('viewInfo');
@@ -498,22 +534,69 @@ function badge(id,gpa,min,label){
   const ok=gpa>=min;
   el.innerHTML=`<span class="badge ${ok?'pass':'fail'}">${label} ${ok?'PASS':'FAIL'} (≥${min})</span>`;
 }
-function naiaRow(gId,bId,gpa,min,testEntered,testPass){
+function naiaRow(gId,bId,gpa,min,testEntered,testPass,rankEntered,rankPass){
   const g=document.getElementById(gId), b=document.getElementById(bId);
   if(!g||!b) return;
   if(gpa==null){ g.innerHTML=''; b.innerHTML=''; return; }
   const gpaPass=gpa>=min;
   g.innerHTML=`<span class="badge ${gpaPass?'pass':'fail'}">${gpaPass?'MET':'not met'}</span>`;
-  const legs=(gpaPass?1:0)+(testPass?1:0);
+  const legs=(gpaPass?1:0)+(testPass?1:0)+(rankPass?1:0);
+  const unknownLegs=(!testEntered?1:0)+(!rankEntered?1:0); // legs that could still be met but aren't entered
   let cls,txt;
   if(legs>=2){ cls='pass'; txt='QUALIFIES (2 of 3)'; }
-  else if(legs===1){ cls='pend'; txt='1 of 3 — needs top-50% rank'; }
-  else { cls='fail'; txt = testEntered ? 'GPA & test not met' : 'GPA not met'; }
+  else if(legs+unknownLegs>=2){ cls='pend'; const need=2-legs; txt=`${legs} of 3 — needs ${need} more (`+[!testEntered?'test':null,!rankEntered?'top-50% rank':null].filter(Boolean).join(' or ')+')'; }
+  else { cls='fail'; txt=`${legs} of 3 — does not qualify`; }
   b.innerHTML=`<span class="badge ${cls}">${txt}</span>`;
 }
-function saveTests(){ try{ localStorage.setItem('naiaTests', JSON.stringify({act:val('act'),sat:val('sat')})); }catch(e){} }
-function loadTests(){ try{ const s=JSON.parse(localStorage.getItem('naiaTests')||'{}'); if(s.act)document.getElementById('act').value=s.act; if(s.sat)document.getElementById('sat').value=s.sat; }catch(e){} }
-function val(id){ return document.getElementById(id).value; }
+// Official SAT<->ACT concordance (College Board/ACT 2018), abbreviated.
+const CONCORD=[[1600,36],[1570,35],[1530,34],[1490,33],[1450,32],[1420,31],[1390,30],[1360,29],[1330,28],[1300,27],[1260,26],[1230,25],[1200,24],[1160,23],[1130,22],[1100,21],[1060,20],[1030,19],[990,18],[960,17],[920,16],[880,15],[830,14],[780,13],[730,12],[690,11],[650,10]];
+function satToAct(sat){ for(const [s,a] of CONCORD){ if(sat>=s) return a; } return 10; }
+function actToSat(act){ let best=CONCORD[CONCORD.length-1]; for(const [s,a] of CONCORD){ if(a<=act){ best=[s,a]; } } // find highest SAT whose ACT<=act
+  for(const [s,a] of CONCORD){ if(a===act) return s; } // exact
+  // nearest by act
+  let cand=CONCORD.reduce((p,c)=>Math.abs(c[1]-act)<Math.abs(p[1]-act)?c:p); return cand[0]; }
+function saveTests(){ try{ localStorage.setItem('naiaTests', JSON.stringify({act:val('act'),sat:val('sat'),rank:val('rank')})); }catch(e){} }
+function loadTests(){ try{ const s=JSON.parse(localStorage.getItem('naiaTests')||'{}'); if(s.act)document.getElementById('act').value=s.act; if(s.sat)document.getElementById('sat').value=s.sat; if(s.rank)document.getElementById('rank').value=s.rank; }catch(e){} }
+function val(id){ const e=document.getElementById(id); return e?e.value:''; }
+
+/* ---------- Save / load / share a full profile ---------- */
+const SETTING_IDS=['s7A','s7B','s7C','s7D','s10A','s10B','s10C','s10D','bH','bAP','ncaaUnit','diMin','diiMin','naiaMin'];
+function gatherProfile(){
+  const settings={}; SETTING_IDS.forEach(id=>{const e=document.getElementById(id); if(e)settings[id]=e.value;});
+  return {v:1, data:data, tests:{act:val('act'),sat:val('sat'),rank:val('rank')}, settings};
+}
+function applyProfile(prof){
+  if(!prof||typeof prof!=='object') throw new Error('invalid profile');
+  data = Array.isArray(prof.data)? prof.data : [];
+  const t=prof.tests||{}; ['act','sat','rank'].forEach(k=>{const e=document.getElementById(k); if(e)e.value=t[k]||'';});
+  if(prof.settings) Object.entries(prof.settings).forEach(([id,v])=>{const e=document.getElementById(id); if(e)e.value=v;});
+  saveTests(); render();
+}
+function profMsg(m){ const e=document.getElementById('profMsg'); if(e){ e.textContent=m; setTimeout(()=>{if(e.textContent===m)e.textContent='';},4000);} }
+function saveProfile(){
+  const txt=JSON.stringify(gatherProfile(),null,1);
+  dl('gpa-profile.json', txt); profMsg('Profile saved to gpa-profile.json');
+}
+function loadProfile(input){
+  const file=input.files[0]; if(!file) return;
+  const rd=new FileReader();
+  rd.onload=e=>{ try{ applyProfile(JSON.parse(e.target.result)); profMsg('Profile loaded ✓'); }catch(err){ alert('Could not load profile: '+err.message);} input.value=''; };
+  rd.readAsText(file);
+}
+function b64enc(s){ return btoa(unescape(encodeURIComponent(s))); }
+function b64dec(s){ return decodeURIComponent(escape(atob(s))); }
+function copyShareLink(){
+  try{
+    const code=b64enc(JSON.stringify(gatherProfile()));
+    const url=location.origin+location.pathname+'#p='+code;
+    if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(()=>profMsg('Share link copied ✓ ('+url.length+' chars)'),()=>prompt('Copy this link:',url)); }
+    else prompt('Copy this link:',url);
+  }catch(e){ alert('Could not build link: '+e.message); }
+}
+function loadFromHash(){
+  try{ if(location.hash.startsWith('#p=')){ applyProfile(JSON.parse(b64dec(location.hash.slice(3)))); return true; } }catch(e){}
+  return false;
+}
 
 /* ---------- College search & match (U.S. Dept of Education College Scorecard) ---------- */
 const SCORECARD_KEY='Tkk0SUgEkpPUdOwYds4E2seYSs5eAmtrW6KtQqju'; // free api.data.gov key (1,000 req/hr). Replace with your own from https://api.data.gov/signup/ if forking.
@@ -549,7 +632,11 @@ let ATH={schools:{}};
 function loadAthletics(){ fetch('athletics.json').then(r=>r.json()).then(d=>{ATH=d;}).catch(()=>{}); }
 function athOf(id){ return ATH.schools? ATH.schools[String(id)] : null; }
 const SC_STATES=['AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY'];
-let _scRows=null,_scMajor='',_scInfo=null;
+let _scRows=null,_scMajor='',_scInfo=null,_scById={},favs={};
+function loadFavs(){ try{ favs=JSON.parse(localStorage.getItem('collegeFavs')||'{}'); }catch(e){ favs={}; } }
+function saveFavs(){ try{ localStorage.setItem('collegeFavs', JSON.stringify(favs)); }catch(e){} }
+function toggleFav(id){ if(favs[id]) delete favs[id]; else if(_scById[id]) favs[id]=_scById[id]; saveFavs(); refreshCollegeMatch(); updateCompareBtn(); }
+function updateCompareBtn(){ const b=document.getElementById('cCompareBtn'); if(!b)return; const n=Object.keys(favs).length; b.textContent='⭐ Compare ('+n+')'; b.style.display=n?'inline-block':'none'; }
 function initCollege(){
   const st=document.getElementById('cState'), mj=document.getElementById('cMajor');
   if(st && !st.options.length) st.innerHTML='<option value="">Any state</option>'+SC_STATES.map(s=>`<option>${s}</option>`).join('');
@@ -652,8 +739,10 @@ function renderColleges(rows, major, info){
   _scRows=rows; _scMajor=major; _scInfo=info;
   const box=document.getElementById('cResults');
   if(!rows.length){ box.innerHTML='<p class="note">No matching schools found. Try a different name'+(major?' or major':'')+', or relax a filter.</p>'; return; }
+  rows.forEach(r=>{ _scById[String(r['id'])]=r; });
   const hdr = info? `<p class="note" style="margin:2px 0 6px"><b>${rows.length}</b> school${rows.length>1?'s':''} shown${info.more?' — more available; increase <b>Results</b> or add a school name/state to narrow':''}.</p>` : '';
   box.innerHTML = hdr + rows.map(r=>{
+    const id=String(r['id']);
     const url=r['school.school_url']; const link=url?('https://'+(''+url).replace(/^https?:\/\//,'')):null;
     const sr=satRange(r), arr=actRange(r);
     const net=r['latest.cost.avg_net_price.public']!=null?r['latest.cost.avg_net_price.public']:r['latest.cost.avg_net_price.private'];
@@ -662,9 +751,10 @@ function renderColleges(rows, major, info){
     const majShare = famKey? r['latest.academics.program_percentage.'+famKey]:null;
     const offersCip = major.startsWith('cip:');
     const a=athOf(r['id']); const divLbl=a?SC_DIV_LABEL[a[0]]:null;
+    const fav=!!favs[id];
     return `<div class="college">
       <div class="top">
-        <div class="nm">${link?`<a href="${link}" target="_blank" rel="noopener">${esc(r['school.name'])} ↗</a>`:esc(r['school.name'])}</div>
+        <div class="nm"><button class="star" onclick="toggleFav('${id}')" aria-label="${fav?'Remove from':'Add to'} compare list" aria-pressed="${fav}" title="${fav?'Remove from':'Add to'} compare">${fav?'★':'☆'}</button> ${link?`<a href="${link}" target="_blank" rel="noopener">${esc(r['school.name'])} ↗</a>`:esc(r['school.name'])}</div>
         <span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
           ${divLbl?`<span class="badge divb" title="Athletic classification (EADA 2024-25)">${divLbl}</span>`:''}
           <span class="badge ${mcls}"${mtip?` title="${esc(mtip)}"`:''}>${ml?('Match: '+ml):mtip}</span>
@@ -685,6 +775,26 @@ function renderColleges(rows, major, info){
   }).join('');
 }
 function refreshCollegeMatch(){ if(_scRows) renderColleges(_scRows,_scMajor,_scInfo); }
+function openCompare(){
+  const ids=Object.keys(favs); const body=document.getElementById('compareBody');
+  if(!ids.length){ body.innerHTML='<p class="note">No starred schools yet. Click the ☆ next to a school to add it.</p>'; }
+  else {
+    const rowsFor=(label,fn)=>'<tr><th>'+label+'</th>'+ids.map(id=>'<td>'+fn(favs[id])+'</td>').join('')+'</tr>';
+    let h='<table class="cmp"><tr><th>School</th>'+ids.map(id=>{const r=favs[id];const a=athOf(id);return '<td><b>'+esc(r['school.name'])+'</b> <button class="star" onclick="toggleFav(\''+id+'\');openCompare()" title="Remove" aria-label="Remove">★</button>'+(a?'<br><span class="badge divb">'+SC_DIV_LABEL[a[0]]+'</span>':'')+'</td>';}).join('')+'</tr>';
+    h+=rowsFor('Location',r=>esc((r['school.city']||'')+', '+(r['school.state']||'')));
+    h+=rowsFor('Admit rate',r=>scPct(r['latest.admissions.admission_rate.overall']));
+    h+=rowsFor('SAT mid-50',r=>{const x=satRange(r);return x?x[0]+'–'+x[1]:'—';});
+    h+=rowsFor('ACT mid-50',r=>{const x=actRange(r);return x?x[0]+'–'+x[1]:'—';});
+    h+=rowsFor('Avg net price',r=>{const n=r['latest.cost.avg_net_price.public']!=null?r['latest.cost.avg_net_price.public']:r['latest.cost.avg_net_price.private'];return scMoney(n)+'/yr';});
+    h+=rowsFor('Tuition in/out',r=>scMoney(r['latest.cost.tuition.in_state'])+' / '+scMoney(r['latest.cost.tuition.out_of_state']));
+    h+=rowsFor('Undergrads',r=>r['latest.student.size']!=null?(+r['latest.student.size']).toLocaleString():'—');
+    h+=rowsFor('Academic match',r=>{const [ml,mtip,mcls]=matchLabel(r);return '<span class="badge '+mcls+'">'+(ml||mtip)+'</span>';});
+    body.innerHTML=h;
+  }
+  document.getElementById('compareModal').classList.add('open');
+}
+function closeCompare(){ document.getElementById('compareModal').classList.remove('open'); }
+function clearFavs(){ if(Object.keys(favs).length && confirm('Remove all starred schools?')){ favs={}; saveFavs(); updateCompareBtn(); refreshCollegeMatch(); openCompare(); } }
 
 /* ---------- CSV ---------- */
 const HEADERS=["Term","Course","Category","Percent","CreditHours","Track","Planned"];
@@ -788,9 +898,11 @@ document.querySelectorAll('.settings input').forEach(el=>el.addEventListener('in
 
 load();
 loadTests();
+loadFavs();
 initCollege();
 loadAthletics();
-if(!data.length) data=[blankRow(),blankRow(),blankRow()];
+updateCompareBtn();
+if(!loadFromHash()){ if(!data.length) data=[blankRow(),blankRow(),blankRow()]; }
 render();
 </script>
 

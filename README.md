@@ -10,6 +10,11 @@ grading scale and computes:
 - **College search & match** — live search of U.S. colleges (federal **College Scorecard**) by name / state / major, with **NCAA/NAIA division** labels and **division + men's/women's sport filters** (federal **EADA** data), showing **cost, admission rate, SAT/ACT ranges**, plus an **academic match** (Likely / Target / Reach) based on the ACT/SAT entered
 - **Senior-year projection** — flag planned courses and toggle between *Completed only* and *Projected at graduation*
 - **Light / dark mode** — toggle in the header; remembers your choice and follows your system preference by default
+- **Save / share a profile** — export everything (courses, scores, settings) to a `.json` file, reload it later, or copy a **shareable link** (data encoded in the URL — still nothing sent to a server)
+- **SAT ↔ ACT concordance** — enter one score and the app estimates the other (official 2018 concordance), with a one-click "use it"
+- **Class-rank input** — completes NAIA's third "2 of 3" leg (top-50%) instead of leaving it assumed
+- **Compare / favorites** — ⭐ star schools in the college search and view them side-by-side (division, cost, admit rate, SAT/ACT, your match)
+- **Accessibility** — ARIA labels on controls/dialogs, keyboard support (Esc closes dialogs), and theme contrast
 
 Everything runs **client-side** — no server, no data leaves the browser. Suitable for student
 records (FERPA-friendly).
@@ -25,9 +30,13 @@ records (FERPA-friendly).
 |:---:|:---:|
 | ![Course entry with sample data](docs/screenshot-overview.png) | ![GPA results with NCAA DI/DII and NAIA checks](docs/screenshot-results.png) |
 
-**College search & match** — live cost, admission rate, SAT/ACT ranges, and a Likely/Target/Reach estimate:
+**College search & match** — live cost, admission rate, SAT/ACT ranges, division/sport filters, and a Likely/Target/Reach estimate:
 
 ![College search and academic match](docs/screenshot-colleges.png)
+
+**Compare favorites** — star schools and view them side-by-side:
+
+![Compare saved colleges](docs/screenshot-compare.png)
 
 Built-in **How to use** guide (opens automatically on first visit):
 
