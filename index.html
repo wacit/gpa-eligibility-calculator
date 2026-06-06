@@ -702,17 +702,27 @@ function closePaste(){ document.getElementById('pasteModal').classList.remove('o
 function pasteMsg(m){ const e=document.getElementById('pasteMsg'); if(e){ e.textContent=m; } }
 const AI_PROMPT=`I'm attaching a photo/PDF of a high school transcript or report card. Convert it into CSV for a GPA calculator.
 
-Output ONLY the CSV (no commentary, no code fences) with this exact header and column order:
+Output ONLY the CSV with this exact header and column order:
 Term,Course,Category,Percent,CreditHours,Track,Planned
 
-Rules:
-- One row per semester grade (e.g., S1 and S2). If only final/year grades are shown, one row per course is fine.
+IMPORTANT — exclude these rows entirely (do NOT include them in the CSV):
+- Study Hall, Guided Study, Study Skills, Resource Period
+- Advisory, Homeroom, Seminar, FLEX, SEL, Office Aide, Teacher Aide
+- Lunch periods, free periods, "Pass / Fail" only courses
+- Any course that shows no real letter or numeric grade (e.g., a blank, "P", "F", "I", "W", "WP", "M", "AU", "NC", "—", "N/A")
+- Any course with 0 credit AND no graded percent
+- Withdrawn / dropped courses
+When in doubt, skip the row. Don't invent grades.
+
+For courses you DO include, follow these rules:
+- One row per semester grade (S1, S2, Q1–Q4, etc.). If only final/year grades are shown, one row per course is fine.
 - Term: a short label like "Freshman S1".
-- Course: the class name.
-- Category: pick exactly one of: English, Math, Science, Social Science, Foreign Language, Other Academic, Elective / Non-Core. Use "Elective / Non-Core" for Band, PE/Gym, Health, study hall, and similar non-academic classes.
-- Percent: the numeric percent grade (e.g., 88). If only a letter grade is shown, estimate the midpoint: A=95, B=85, C=75, D=65, F=55.
-- CreditHours: the course's credit/units (use 1 if unknown; use 0 if it was failed for no credit).
-- Track: Regular, Honors, or AP (AP for AP/Advanced Placement; Honors for Honors/H; otherwise Regular).
+- Course: the class name as printed.
+- Category: pick exactly one of: English, Math, Science, Social Science, Foreign Language, Other Academic, Elective / Non-Core.
+  Use "Elective / Non-Core" for graded electives like Band, Choir, PE/Gym, Health, Personal Finance, Yearbook, Drama, Art, Driver's Ed — they affect the overall GPA but NOT the NCAA core GPA.
+- Percent: the numeric percent grade (e.g., 88). If only a letter grade is shown, estimate the midpoint: A=95, B=85, C=75, D=65, F=55. If only +/- letter shown, adjust ±2 (e.g., B+=88, B-=82).
+- CreditHours: the course's credit/units as printed (use 1 if unknown; use 0 if it was failed for no credit).
+- Track: Regular, Honors, or AP (AP for AP/Advanced Placement / IB-HL; Honors for Honors/H/Advanced; otherwise Regular).
 - Planned: No for completed courses; Yes only for future/in-progress courses.
 
 Output the CSV in TWO ways so it's easy to use:
@@ -737,6 +747,9 @@ function guessCat(t){ t=(t||'').toLowerCase();
   if(/\b(spanish|french|german|latin|chinese|mandarin|japanese|italian|language)/.test(t)) return 'Foreign Language';
   return 'Elective / Non-Core';
 }
+// Non-graded "courses" that clutter transcripts — filtered out of paste imports
+const SKIP_COURSE_RE=/\b(study hall|guided study|study skills|resource period|advisory|advisement|homeroom|home ?room|seminar|flex period|sel period|office aide|teacher aide|library aide|lunch period|free period|passing period|attendance|conference period|directed studies?)\b/i;
+function isJunkCourse(name){ return SKIP_COURSE_RE.test(name||''); }
 function downloadPastedCSV(){
   let text=document.getElementById('pasteBox').value.trim();
   if(!text){ pasteMsg('Paste CSV text first, then click Save.'); return; }
@@ -775,11 +788,12 @@ function parsePasted(){
       cat=guessCat(course);
       const h=cells.find((c,i)=>i!==pIdx && /^\d(\.\d+)?$/.test(c) && +c<=10); if(h) hrs=parseFloat(h);
     }
+    if(isJunkCourse(course)){ skipped++; continue; }   // study hall, advisory, homeroom, etc.
     add.push({term,course,cat:cat||'Elective / Non-Core',pct:''+pct,hrs,track,planned});
   }
-  if(!add.length){ pasteMsg('No grade rows found. Each line needs a course name and a 0–100 percent.'); return; }
+  if(!add.length){ pasteMsg('No grade rows found. Each line needs a course name and a 0–100 percent. (Study hall / advisory / homeroom periods are skipped.)'); return; }
   data=data.concat(add); render(); closePaste();
-  profMsg(add.length+' course'+(add.length>1?'s':'')+' added'+(skipped?' ('+skipped+' line(s) skipped)':'')+' — review the Category column for NCAA accuracy.');
+  profMsg(add.length+' course'+(add.length>1?'s':'')+' added'+(skipped?' ('+skipped+' line(s) skipped — non-graded periods or unrecognized rows)':'')+' — review the Category column for NCAA accuracy.');
 }
 
 /* ---------- College search & match (U.S. Dept of Education College Scorecard) ---------- */
@@ -1030,14 +1044,17 @@ function parseCSV(text){
   const idx=(name)=>head.findIndex(h=>h.replace(/[^a-z]/g,'')===name);
   const iT=idx('term'),iC=idx('course'),iCat=idx('category'),iP=idx('percent'),iH=idx('credithours'),iTr=idx('track'),iPl=idx('planned');
   if(iP<0){ alert('CSV must include a "Percent" column. Headers found: '+head.join(', ')); return; }
-  const out=[];
+  const out=[]; let skipped=0;
   for(let k=1;k<lines.length;k++){
     const c=splitCSV(lines[k]);
+    const course=(c[iC]||'').trim();
+    if(isJunkCourse(course)){ skipped++; continue; }   // drop study hall / advisory / homeroom etc.
     const cat=normCat(c[iCat]); const tr=normTrack(c[iTr]);
     const pl = iPl>=0 ? /^(y|t|1)/i.test((c[iPl]||'').trim()) : false;
-    out.push({term:c[iT]||"",course:c[iC]||"",cat:cat,pct:(c[iP]||"").trim(),hrs:parseFloat(c[iH])||0,track:tr,planned:pl});
+    out.push({term:c[iT]||"",course,cat:cat,pct:(c[iP]||"").trim(),hrs:parseFloat(c[iH])||0,track:tr,planned:pl});
   }
   data=out; render();
+  if(skipped) profMsg(out.length+' courses imported ('+skipped+' non-graded period'+(skipped>1?'s':'')+' skipped: study hall, advisory, etc.).');
 }
 function splitCSV(line){
   const res=[]; let cur='',q=false;
