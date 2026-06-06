@@ -500,17 +500,46 @@ function loadTests(){ try{ const s=JSON.parse(localStorage.getItem('naiaTests')|
 function val(id){ return document.getElementById(id).value; }
 
 /* ---------- College search & match (U.S. Dept of Education College Scorecard) ---------- */
-const SCORECARD_KEY='DEMO_KEY'; // FREE shared demo key (heavily rate-limited). Get your own at https://api.data.gov/signup/ and replace this.
+const SCORECARD_KEY='Tkk0SUgEkpPUdOwYds4E2seYSs5eAmtrW6KtQqju'; // free api.data.gov key (1,000 req/hr). Replace with your own from https://api.data.gov/signup/ if forking.
 const SC_BASE='https://api.data.gov/ed/collegescorecard/v1/schools';
-const SC_MAJORS=[['Any major',''],['Business & Marketing','business_marketing'],['Engineering','engineering'],['Computer & IT','computer'],['Biological Sciences','biological'],['Health Professions','health'],['Psychology','psychology'],['Education','education'],['Visual & Performing Arts','visual_performing'],['Communications','communication'],['Social Sciences','social_science'],['Mathematics','mathematics'],['English / Language','english'],['Physical Sciences','physical_science'],['Agriculture','agriculture'],['Criminal Justice / Law Enf.','security_law_enforcement']];
+// Top-level category -> [family key for "All", [specific major label, CIP-4 code]...]
+const SC_MAJOR_GROUPS=[
+ ['Engineering','engineering',[['Mechanical','1419'],['Electrical','1410'],['Civil','1408'],['Computer Engineering','1409'],['Chemical','1407'],['Biomedical','1405'],['Aerospace','1402'],['Industrial','1435'],['Environmental','1414']]],
+ ['Computer & IT','computer',[['Computer Science','1107'],['Information Technology','1110'],['Information Science','1104'],['Computer Programming','1102'],['Data & Information Systems','1101']]],
+ ['Business','business_marketing',[['Accounting','5203'],['Finance','5208'],['Marketing','5214'],['Management','5202'],['Business Admin (general)','5201'],['Entrepreneurship','5207'],['International Business','5211'],['Human Resources','5210']]],
+ ['Health Professions','health',[['Nursing (RN)','5138'],['Public Health','5122'],['Kinesiology / Exercise Sci.','3105'],['Health Administration','5107'],['Pharmacy','5120'],['Allied Health','5100']]],
+ ['Biological Sciences','biological',[['Biology (general)','2601'],['Biochemistry','2602'],['Neuroscience','2615'],['Microbiology','2605'],['Zoology','2607']]],
+ ['Psychology','psychology',[['Psychology (general)','4201'],['Clinical / Counseling','4228']]],
+ ['Social Sciences','social_science',[['Economics','4506'],['Political Science','4510'],['Sociology','4511'],['International Relations','4509'],['Geography','4507'],['Anthropology','4502']]],
+ ['Education','education',[['Elementary Education','1312'],['Secondary Education','1313'],['Special Education','1310'],['Phys Ed / Coaching','1314']]],
+ ['Visual & Performing Arts','visual_performing',[['Music','5009'],['Theatre / Drama','5005'],['Fine / Studio Arts','5007'],['Film / Video','5006'],['Design','5004'],['Dance','5003']]],
+ ['Communications','communication',[['Communication / Media','0901'],['Journalism','0904'],['Radio / TV / Digital','0907'],['Public Relations','0909']]],
+ ['Criminal Justice','security_law_enforcement',[['Criminal Justice','4301'],['Homeland Security','4304']]],
+ ['Mathematics','mathematics',[['Mathematics','2701'],['Statistics','2705']]],
+ ['Physical Sciences','physical_science',[['Chemistry','4005'],['Physics','4008'],['Geology / Earth Sci.','4006'],['Astronomy','4002']]],
+ ['Humanities & Languages',null,[['English Lang & Lit','2301'],['History','5401'],['Philosophy','3801'],['Foreign Languages','1601']]],
+ ['Agriculture','agriculture',[['Agriculture (general)','0100'],['Animal Science','0109'],['Agribusiness','0101']]],
+ ['Architecture','architecture',[['Architecture','0402']]],
+];
+const SC_MAJOR_LABEL={};
+SC_MAJOR_GROUPS.forEach(([grp,fam,items])=>{ if(fam) SC_MAJOR_LABEL['fam:'+fam]='All '+grp; items.forEach(([lbl,code])=>SC_MAJOR_LABEL['cip:'+code]=lbl); });
 const SC_STATES=['AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY'];
 let _scRows=null,_scMajor='';
 function initCollege(){
   const st=document.getElementById('cState'), mj=document.getElementById('cMajor');
   if(st && !st.options.length) st.innerHTML='<option value="">Any state</option>'+SC_STATES.map(s=>`<option>${s}</option>`).join('');
-  if(mj && !mj.options.length) mj.innerHTML=SC_MAJORS.map(m=>`<option value="${m[1]}">${m[0]}</option>`).join('');
+  if(mj && !mj.options.length){
+    let h='<option value="">Any major</option>';
+    for(const [grp,fam,items] of SC_MAJOR_GROUPS){
+      h+=`<optgroup label="${grp}">`;
+      if(fam) h+=`<option value="fam:${fam}">All ${grp}</option>`;
+      for(const [lbl,code] of items) h+=`<option value="cip:${code}">${lbl}</option>`;
+      h+='</optgroup>';
+    }
+    mj.innerHTML=h;
+  }
 }
-function majorLabel(key){ const m=SC_MAJORS.find(x=>x[1]===key); return m?m[0]:'Major'; }
+function majorLabel(key){ return SC_MAJOR_LABEL[key]||'Major'; }
 async function searchColleges(){
   const name=val('cSchool').trim(), state=val('cState'), major=val('cMajor');
   const box=document.getElementById('cResults');
@@ -523,20 +552,23 @@ async function searchColleges(){
     'latest.admissions.sat_scores.75th_percentile.critical_reading','latest.admissions.sat_scores.75th_percentile.math',
     'latest.admissions.act_scores.25th_percentile.cumulative','latest.admissions.act_scores.75th_percentile.cumulative',
     'latest.cost.avg_net_price.public','latest.cost.avg_net_price.private','latest.cost.tuition.in_state','latest.cost.tuition.out_of_state'];
-  if(major) fields.push('latest.academics.program_percentage.'+major);
+  const famKey = major.startsWith('fam:')?major.slice(4):null;
+  const cip = major.startsWith('cip:')?major.slice(4):null;
+  if(famKey) fields.push('latest.academics.program_percentage.'+famKey);
   const p=new URLSearchParams();
   p.set('api_key',SCORECARD_KEY);
   if(name) p.set('school.name',name);
   if(state) p.set('school.state',state);
+  if(cip) p.set('latest.programs.cip_4_digit.code',cip);
   p.set('school.operating','1'); p.set('fields',fields.join(',')); p.set('per_page','50');
   try{
     const res=await fetch(SC_BASE+'?'+p.toString());
-    if(!res.ok) throw new Error('HTTP '+res.status+(res.status===429?' — demo key rate limit reached; add your own free api.data.gov key':''));
+    if(!res.ok) throw new Error('HTTP '+res.status+(res.status===429?' — API rate limit reached; try again shortly':''));
     const d=await res.json();
     let rows=d.results||[];
     // keep 4-year (bachelor's+) institutions — the NCAA/NAIA universe
     rows=rows.filter(r=>(+r['school.degrees_awarded.highest']||0)>=3);
-    if(major){ const k='latest.academics.program_percentage.'+major; rows=rows.filter(r=>(+r[k]||0)>0); }
+    if(famKey){ const k='latest.academics.program_percentage.'+famKey; rows=rows.filter(r=>(+r[k]||0)>0); }
     rows.sort((a,b)=>(+b['latest.student.size']||0)-(+a['latest.student.size']||0));
     renderColleges(rows.slice(0,20), major);
   }catch(e){ box.innerHTML='<p class="note" style="color:var(--red)">Search failed: '+esc(e.message)+'. Check your connection or try again.</p>'; }
@@ -572,7 +604,9 @@ function renderColleges(rows, major){
     const sr=satRange(r), arr=actRange(r);
     const net=r['latest.cost.avg_net_price.public']!=null?r['latest.cost.avg_net_price.public']:r['latest.cost.avg_net_price.private'];
     const [ml,mtip,mcls]=matchLabel(r);
-    const majShare = major? r['latest.academics.program_percentage.'+major]:null;
+    const famKey = major.startsWith('fam:')?major.slice(4):null;
+    const majShare = famKey? r['latest.academics.program_percentage.'+famKey]:null;
+    const offersCip = major.startsWith('cip:');
     return `<div class="college">
       <div class="top">
         <div class="nm">${link?`<a href="${link}" target="_blank" rel="noopener">${esc(r['school.name'])} ↗</a>`:esc(r['school.name'])}</div>
@@ -587,6 +621,7 @@ function renderColleges(rows, major){
         <span><b>Tuition in/out:</b> ${scMoney(r['latest.cost.tuition.in_state'])} / ${scMoney(r['latest.cost.tuition.out_of_state'])}</span>
         ${r['latest.student.size']!=null?`<span><b>Undergrads:</b> ${(+r['latest.student.size']).toLocaleString()}</span>`:''}
         ${majShare!=null?`<span><b>${esc(majorLabel(major))}:</b> ${(majShare*100).toFixed(1)}% of degrees</span>`:''}
+        ${offersCip?`<span style="color:var(--green)"><b>✓ Offers ${esc(majorLabel(major))}</b></span>`:''}
       </div>
     </div>`;
   }).join('');
