@@ -153,6 +153,7 @@
     <ul>
       <li><b>Type them in</b> — click <span class="tag">+ Add course</span> and fill each row.</li>
       <li><b>Import a spreadsheet</b> — click <span class="tag">Download CSV template</span>, fill it in Excel/Google Sheets, then <span class="tag">Import CSV…</span>. Not sure where your grades are? Click <span class="tag">📥 Where's my data?</span> for how to get them out of PowerSchool, Infinite Campus, Skyward, and more.</li>
+      <li><b>Paste, or convert a photo with AI</b> — click <span class="tag">📋 Paste / AI import</span>. Paste rows from a spreadsheet/portal, or copy the built-in <b>AI prompt</b>, give it a photo of a transcript in ChatGPT/Claude/Gemini, and paste the result back.</li>
       <li><b>Try it first</b> — click <span class="tag">Load sample data</span> to see a worked example, then <span class="tag">Clear all</span> when ready.</li>
     </ul>
     <p><b>Save or move your work:</b> <span class="tag">💾 Save profile</span> downloads everything (courses, scores, settings) as a file; <span class="tag">📂 Load profile</span> restores it on any device; <span class="tag">🔗 Copy share link</span> makes a link you can send to a counselor or open elsewhere (the data rides in the link — still nothing sent to a server).</p>
@@ -256,6 +257,23 @@
   </div>
 </div>
 
+<div class="modal" id="pasteModal" role="dialog" aria-modal="true" aria-label="Paste or AI import grades" onclick="if(event.target===this)closePaste()">
+  <div class="box">
+    <button class="close" onclick="closePaste()" title="Close" aria-label="Close">✕</button>
+    <h2>Paste grades or use an AI</h2>
+
+    <h3>Option A — turn a photo/PDF into a CSV with an AI</h3>
+    <p>Best for a printed transcript or report card. Click below to copy a ready-made prompt, then paste it <b>plus a photo or PDF of the transcript</b> into ChatGPT, Claude, or Gemini. Paste the CSV it returns into the box below (or save it and use <b>Import CSV</b>).</p>
+    <p><button class="sec" onclick="copyAIPrompt()">🤖 Copy AI prompt</button> <span class="small" id="pasteMsg" role="status" aria-live="polite"></span></p>
+
+    <h3>Option B — paste rows directly</h3>
+    <p class="small" style="color:var(--muted)">Paste from the AI, a spreadsheet, or a school portal — one course per line. Columns can be separated by tabs, commas, or spaces. Best order: <code>Term, Course, Category, Percent, CreditHours, Track</code>. At minimum each line needs a <b>course name</b> and a <b>0–100 percent</b>.</p>
+    <textarea id="pasteBox" rows="8" style="width:100%;font-family:monospace;font-size:.85rem" placeholder="Freshman S1, Algebra I, Math, 86, 1, Regular&#10;Freshman S1, English 9, English, 88, 1, Honors&#10;Freshman S1, Band, Elective / Non-Core, 95, 1, Regular" aria-label="Paste grade rows here"></textarea>
+    <p style="text-align:center;margin-top:14px"><button onclick="parsePasted()">Add to my courses</button> <button class="ghost" onclick="closePaste()">Cancel</button></p>
+    <p class="small" style="color:var(--muted)">After importing, please <b>review the Category column</b> — it drives the NCAA core-GPA, and auto-detected categories aren't always perfect.</p>
+  </div>
+</div>
+
 <div class="wrap">
 
   <!-- STEP 1: data -->
@@ -266,6 +284,7 @@
       <button class="sec" onclick="addPlanned()">+ Add planned (senior) course</button>
       <button class="sec" onclick="document.getElementById('csvin').click()">Import CSV…</button>
       <input id="csvin" type="file" accept=".csv,text/csv" style="display:none" onchange="importCSV(this)">
+      <button class="sec" onclick="openPaste()">📋 Paste / AI import</button>
       <button class="ghost" onclick="openImport()">📥 Where's my data?</button>
       <button class="ghost" onclick="downloadTemplate()">Download CSV template</button>
       <button class="ghost" onclick="loadSample()">Load sample data</button>
@@ -432,7 +451,7 @@ function openHelp(){ document.getElementById('helpModal').classList.add('open');
 function closeHelp(){ document.getElementById('helpModal').classList.remove('open'); }
 function openImport(){ document.getElementById('importModal').classList.add('open'); }
 function closeImport(){ document.getElementById('importModal').classList.remove('open'); }
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeHelp(); closeImport(); closeCompare(); } });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeHelp(); closeImport(); closeCompare(); closePaste(); } });
 try{ if(!localStorage.getItem('seenHelp')){ openHelp(); localStorage.setItem('seenHelp','1'); } }catch(e){}
 const CORE_CATS = ["English","Math","Science","Social Science","Foreign Language","Other Academic"];
 const CATS = [...CORE_CATS, "Elective / Non-Core"];
@@ -616,6 +635,70 @@ function copyShareLink(){
 function loadFromHash(){
   try{ if(location.hash.startsWith('#p=')){ applyProfile(JSON.parse(b64dec(location.hash.slice(3)))); return true; } }catch(e){}
   return false;
+}
+
+/* ---------- Paste / AI import ---------- */
+function openPaste(){ document.getElementById('pasteModal').classList.add('open'); document.getElementById('pasteBox').focus(); }
+function closePaste(){ document.getElementById('pasteModal').classList.remove('open'); }
+function pasteMsg(m){ const e=document.getElementById('pasteMsg'); if(e){ e.textContent=m; } }
+const AI_PROMPT=`I'm attaching a photo/PDF of a high school transcript or report card. Convert it into CSV for a GPA calculator.
+
+Output ONLY the CSV (no commentary, no code fences) with this exact header and column order:
+Term,Course,Category,Percent,CreditHours,Track,Planned
+
+Rules:
+- One row per semester grade (e.g., S1 and S2). If only final/year grades are shown, one row per course is fine.
+- Term: a short label like "Freshman S1".
+- Course: the class name.
+- Category: pick exactly one of: English, Math, Science, Social Science, Foreign Language, Other Academic, Elective / Non-Core. Use "Elective / Non-Core" for Band, PE/Gym, Health, study hall, and similar non-academic classes.
+- Percent: the numeric percent grade (e.g., 88). If only a letter grade is shown, estimate the midpoint: A=95, B=85, C=75, D=65, F=55.
+- CreditHours: the course's credit/units (use 1 if unknown; use 0 if it was failed for no credit).
+- Track: Regular, Honors, or AP (AP for AP/Advanced Placement; Honors for Honors/H; otherwise Regular).
+- Planned: No for completed courses; Yes only for future/in-progress courses.
+
+Return just the CSV so I can paste or save it.`;
+function copyAIPrompt(){
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(AI_PROMPT).then(()=>pasteMsg('Prompt copied ✓ — paste it + a transcript photo into ChatGPT/Claude/Gemini.'),()=>pasteMsg('Copy failed — select the prompt manually.')); }
+  else { pasteMsg('Clipboard unavailable in this browser.'); }
+}
+function guessCat(t){ t=(t||'').toLowerCase();
+  if(/\b(english|lit|literature|writing|composition|rhetoric)/.test(t)) return 'English';
+  if(/\b(math|algebra|geometry|calculus|trig|statistic|pre-?calc|quantitative)/.test(t)) return 'Math';
+  if(/\b(biolog|chem|physic|science|anatomy|environ|geolog|astronom)/.test(t)) return 'Science';
+  if(/\b(history|civics|govern|geograph|econ|psycholog|sociolog|social|world studies)/.test(t)) return 'Social Science';
+  if(/\b(spanish|french|german|latin|chinese|mandarin|japanese|italian|language)/.test(t)) return 'Foreign Language';
+  return 'Elective / Non-Core';
+}
+function parsePasted(){
+  const text=document.getElementById('pasteBox').value;
+  const lines=text.replace(/\r/g,'').split('\n').map(l=>l.trim()).filter(Boolean);
+  if(!lines.length){ pasteMsg('Paste some rows first.'); return; }
+  let start=0;
+  if(/\b(course|term|percent|category|track)\b/i.test(lines[0]) && !/\b\d{2,3}\b/.test(lines[0])) start=1; // header
+  const add=[]; let skipped=0;
+  for(let k=start;k<lines.length;k++){
+    let cells = lines[k].includes('\t') ? lines[k].split('\t') : (lines[k].includes(',') ? splitCSV(lines[k]) : lines[k].split(/\s{2,}/));
+    cells=cells.map(c=>c.trim()).filter(c=>c!=='');
+    const pIdx=cells.findIndex(c=>/^\d{1,3}(\.\d+)?$/.test(c) && +c>=0 && +c<=100 && +c>5);
+    if(pIdx<0||cells.length<2){ skipped++; continue; }
+    const pct=cells[pIdx];
+    let term='',course='',cat='',hrs=1,track='Regular',planned=false;
+    if(cells.length>=4 && pIdx===3){ // full template order
+      term=cells[0]; course=cells[1]; cat=normCat(cells[2]); hrs=parseFloat(cells[4])||1; track=normTrack(cells[5]||'Regular');
+      if(cells[6]) planned=/^(y|t|1)/i.test(cells[6]);
+    } else {
+      const texts=cells.filter((c,i)=>i!==pIdx && !/^\d+(\.\d+)?$/.test(c));
+      texts.sort((a,b)=>b.length-a.length);
+      course=texts[0]||cells[0]||'Course'; term=texts[1]||'';
+      track = /honors|\bh\b/i.test(lines[k])?'Honors' : /\bap\b|advanced placement/i.test(lines[k])?'AP':'Regular';
+      cat=guessCat(course);
+      const h=cells.find((c,i)=>i!==pIdx && /^\d(\.\d+)?$/.test(c) && +c<=10); if(h) hrs=parseFloat(h);
+    }
+    add.push({term,course,cat:cat||'Elective / Non-Core',pct:''+pct,hrs,track,planned});
+  }
+  if(!add.length){ pasteMsg('No grade rows found. Each line needs a course name and a 0–100 percent.'); return; }
+  data=data.concat(add); render(); closePaste();
+  profMsg(add.length+' course'+(add.length>1?'s':'')+' added'+(skipped?' ('+skipped+' line(s) skipped)':'')+' — review the Category column for NCAA accuracy.');
 }
 
 /* ---------- College search & match (U.S. Dept of Education College Scorecard) ---------- */

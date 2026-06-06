@@ -10,6 +10,7 @@ grading scale and computes:
 - **College search & match** — live search of U.S. colleges (federal **College Scorecard**) by name / state / major, with **NCAA/NAIA division** labels and **division + men's/women's sport filters** (federal **EADA** data), showing **cost, admission rate, SAT/ACT ranges**, plus an **academic match** (Likely / Target / Reach) based on the ACT/SAT entered
 - **Senior-year projection** — flag planned courses and toggle between *Completed only* and *Projected at graduation*
 - **Light / dark mode** — toggle in the header; remembers your choice and follows your system preference by default
+- **Paste / AI import** — paste rows from a spreadsheet or portal, or copy a built-in **AI prompt** to turn a transcript photo/PDF into import-ready CSV via ChatGPT/Claude/Gemini
 - **Save / share a profile** — export everything (courses, scores, settings) to a `.json` file, reload it later, or copy a **shareable link** (data encoded in the URL — still nothing sent to a server)
 - **SAT ↔ ACT concordance** — enter one score and the app estimates the other (official 2018 concordance), with a one-click "use it"
 - **Class-rank input** — completes NAIA's third "2 of 3" leg (top-50%) instead of leaving it assumed
@@ -37,6 +38,10 @@ records (FERPA-friendly).
 **Compare favorites** — star schools and view them side-by-side:
 
 ![Compare saved colleges](docs/screenshot-compare.png)
+
+**Paste / AI import** — paste rows or convert a transcript photo to CSV with an AI:
+
+![Paste or AI import](docs/screenshot-paste.png)
 
 Built-in **How to use** guide (opens automatically on first visit):
 
@@ -126,6 +131,11 @@ your **transcript**. (The app has this same guide built in — click **📥 Wher
 Then fill the **CSV template** (one row per semester course) and **Import CSV…**, or type rows in.
 **Only have letter grades?** This tool uses **percentages** — enter a value inside that letter's band
 (e.g. A→95, B→85, C→75), or set your school's exact cutoffs in **Grading scale settings**.
+
+**Fastest path from a paper printout:** click **📋 Paste / AI import** → **Copy AI prompt**, paste it plus a
+photo/PDF of the transcript into ChatGPT, Claude, or Gemini, and paste the CSV it returns back into the box.
+You can also paste rows copied straight from a spreadsheet or school portal — the parser handles tabs, commas,
+or spaces and auto-detects the category and percent.
 
 ## Files
 
