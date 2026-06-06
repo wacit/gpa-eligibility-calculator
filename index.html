@@ -292,13 +292,17 @@
         <li>Press send. Wait 5–15 seconds.</li>
       </ul>
 
-      <h4 style="margin:8px 0 4px;color:var(--navy);font-size:.95rem">4. Copy the CSV the AI returns</h4>
+      <h4 style="margin:8px 0 4px;color:var(--navy);font-size:.95rem">4. Get the CSV back from the AI</h4>
       <p style="font-size:.88rem;margin:4px 0 6px">The AI will respond with rows that look like:</p>
       <pre style="font-size:.78rem;background:var(--th-bg);padding:8px 10px;border-radius:5px;overflow:auto;margin:4px 0 6px">Term,Course,Category,Percent,CreditHours,Track,Planned
 Freshman S1,Algebra I,Math,86,1,Regular,No
 Freshman S1,English 9,English,88,1,Honors,No
 Freshman S1,Band,Elective / Non-Core,95,1,Regular,No</pre>
-      <p style="font-size:.88rem;margin:4px 0 6px">Select the whole CSV (drag, or triple-click then Ctrl+A) and copy it (Ctrl+C). Then paste it into the box below in <b>Option B</b>.</p>
+      <p style="font-size:.88rem;margin:4px 0 6px">You have <b>two ways</b> to bring it in:</p>
+      <ul style="margin:4px 0 8px;padding-left:20px;font-size:.88rem">
+        <li><b>Paste it back here</b> — copy the CSV (triple-click or drag to select, then Ctrl/Cmd+C), paste into the box below in <b>Option B</b>, and click <b>Add to my courses</b>. You can also click <b>💾 Save as CSV file</b> to keep a copy on your computer.</li>
+        <li><b>Download a .csv file directly from the AI</b> — ChatGPT will often offer a downloadable <code>my_grades.csv</code> in its response (a small file/download icon). Claude shows it as a CSV "artifact" you can download. Once you have the file, use <b>Import CSV…</b> in the calculator instead.</li>
+      </ul>
 
       <h4 style="margin:8px 0 4px;color:var(--navy);font-size:.95rem">5. Spot-check the result</h4>
       <ul style="margin:4px 0 8px;padding-left:20px;font-size:.88rem">
@@ -320,7 +324,11 @@ Freshman S1,Band,Elective / Non-Core,95,1,Regular,No</pre>
     <h3>Option B — paste rows directly</h3>
     <p class="small" style="color:var(--muted)">Paste from the AI, a spreadsheet, or a school portal — one course per line. Columns can be separated by tabs, commas, or spaces. Best order: <code>Term, Course, Category, Percent, CreditHours, Track</code>. At minimum each line needs a <b>course name</b> and a <b>0–100 percent</b>.</p>
     <textarea id="pasteBox" rows="8" style="width:100%;font-family:monospace;font-size:.85rem" placeholder="Freshman S1, Algebra I, Math, 86, 1, Regular&#10;Freshman S1, English 9, English, 88, 1, Honors&#10;Freshman S1, Band, Elective / Non-Core, 95, 1, Regular" aria-label="Paste grade rows here"></textarea>
-    <p style="text-align:center;margin-top:14px"><button onclick="parsePasted()">Add to my courses</button> <button class="ghost" onclick="closePaste()">Cancel</button></p>
+    <p style="text-align:center;margin-top:14px">
+      <button onclick="parsePasted()">Add to my courses</button>
+      <button class="sec" onclick="downloadPastedCSV()" title="Save the text in the box above as a .csv file you can keep or re-import later">💾 Save as CSV file</button>
+      <button class="ghost" onclick="closePaste()">Cancel</button>
+    </p>
     <p class="small" style="color:var(--muted)">After importing, please <b>review the Category column</b> — it drives the NCAA core-GPA, and auto-detected categories aren't always perfect.</p>
   </div>
 </div>
@@ -707,7 +715,11 @@ Rules:
 - Track: Regular, Honors, or AP (AP for AP/Advanced Placement; Honors for Honors/H; otherwise Regular).
 - Planned: No for completed courses; Yes only for future/in-progress courses.
 
-Return just the CSV so I can paste or save it.`;
+Output the CSV in TWO ways so it's easy to use:
+1. Show the CSV inline as plain text inside a code block so I can copy it.
+2. If you can attach files, also provide it as a downloadable .csv file named "my_grades.csv" so I can save it directly to my device. (ChatGPT: use Python/data-analysis to write the file; Claude: create a CSV artifact; otherwise just show the inline text.)
+
+No extra commentary outside the CSV.`;
 function copyAIPrompt(){
   if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(AI_PROMPT).then(()=>pasteMsg('Prompt copied ✓ — paste it + a transcript photo into ChatGPT/Claude/Gemini.'),()=>pasteMsg('Copy failed — select the prompt manually.')); }
   else { pasteMsg('Clipboard unavailable in this browser.'); }
@@ -725,9 +737,22 @@ function guessCat(t){ t=(t||'').toLowerCase();
   if(/\b(spanish|french|german|latin|chinese|mandarin|japanese|italian|language)/.test(t)) return 'Foreign Language';
   return 'Elective / Non-Core';
 }
+function downloadPastedCSV(){
+  let text=document.getElementById('pasteBox').value.trim();
+  if(!text){ pasteMsg('Paste CSV text first, then click Save.'); return; }
+  // Strip leading/trailing markdown code-fence lines (```csv ... ```) that some AIs add
+  text=text.replace(/^```\w*\s*\n/i,'').replace(/\n```\s*$/i,'');
+  // If the header row isn't present, add it so the file is import-ready
+  const HEADER='Term,Course,Category,Percent,CreditHours,Track,Planned';
+  if(!/^term\s*,\s*course/i.test(text)) text=HEADER+'\n'+text;
+  dl('my_grades.csv', text);
+  pasteMsg('Saved my_grades.csv ✓ — keep a copy, share it, or re-import later via "Import CSV…".');
+}
 function parsePasted(){
-  const text=document.getElementById('pasteBox').value;
-  const lines=text.replace(/\r/g,'').split('\n').map(l=>l.trim()).filter(Boolean);
+  let text=document.getElementById('pasteBox').value;
+  // Strip markdown code fences that AIs often add (e.g., ```csv ... ```)
+  text=text.replace(/```\w*\s*\n?/g,'').replace(/\n?```\s*$/g,'');
+  const lines=text.replace(/\r/g,'').split('\n').map(l=>l.trim()).filter(l=>l && !/^```/.test(l));
   if(!lines.length){ pasteMsg('Paste some rows first.'); return; }
   let start=0;
   if(/\b(course|term|percent|category|track)\b/i.test(lines[0]) && !/\b\d{2,3}\b/.test(lines[0])) start=1; // header
