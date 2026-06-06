@@ -7,7 +7,7 @@ grading scale and computes:
 - **NCAA core-course GPA** — core academics only, unweighted, with live **Division I (≥2.3)** and **Division II (≥2.2)** PASS/FAIL checks
 - **NAIA eligibility** — evaluates the **"2 of 3"** rule using overall GPA, **ACT/SAT test scores**, and (informationally) class rank
 - **ACT / SAT input** — feeds NAIA's test leg (ACT ≥ 18 / SAT ≥ 970). *The NCAA dropped test scores from DI/DII initial eligibility in 2023, so they don't affect the NCAA result — the app notes this.*
-- **College search & match** — live search of U.S. colleges (federal **College Scorecard**) by name / state / major, showing **cost, admission rate, SAT/ACT ranges**, plus an **academic match** (Likely / Target / Reach) based on the ACT/SAT entered
+- **College search & match** — live search of U.S. colleges (federal **College Scorecard**) by name / state / major, with **NCAA/NAIA division** labels and **division + men's/women's sport filters** (federal **EADA** data), showing **cost, admission rate, SAT/ACT ranges**, plus an **academic match** (Likely / Target / Reach) based on the ACT/SAT entered
 - **Senior-year projection** — flag planned courses and toggle between *Completed only* and *Projected at graduation*
 
 Everything runs **client-side** — no server, no data leaves the browser. Suitable for student
@@ -77,11 +77,13 @@ use the **View** toggle above the results to switch between **Completed only** a
 **Projected (incl. planned)** to see where the GPA is headed at graduation.
 
 ### 6. Explore colleges (optional)
-In **College search & match**, search by school name, state, and/or major. Each result shows **cost** (net price & tuition), **admission rate**, and **SAT/ACT middle-50%** ranges, with a link to the school. If you entered ACT/SAT, you also get an **academic match** badge — **Likely / Target / Reach** — comparing your scores to the school's ranges and selectivity.
+In **College search & match**, search by school name, state, and/or major, then narrow by **NCAA/NAIA division** and a **men's or women's sport**. Each result is labeled with its **division** and shows **cost** (net price & tuition), **admission rate**, and **SAT/ACT middle-50%** ranges, with a link to the school. If you entered ACT/SAT, you also get an **academic match** badge — **Likely / Target / Reach** — comparing your scores to the school's ranges and selectivity.
 - *Estimate only*, not a guarantee; recruited athletes may receive extra admissions support.
-- Data: U.S. Dept. of Education **College Scorecard**. Only your search terms are sent — your grades/scores stay in the browser.
-- Uses a free `api.data.gov` key. The app ships with the shared `DEMO_KEY` (heavily rate-limited); for real use, get a free key at <https://api.data.gov/signup/> and replace `SCORECARD_KEY` in `index.html`.
-- *Coming later:* an NCAA/NAIA athletic-association + division filter.
+- Data: U.S. Dept. of Education **College Scorecard** (cost/admissions/majors) + **EADA 2024-25** (`athletics.json` — division & sponsored sports for ~1,300 NCAA DI/DII/DIII + NAIA schools, joined by IPEDS id).
+- Only your search terms are sent — your grades/scores stay in the browser.
+- Uses a free `api.data.gov` key (`SCORECARD_KEY` in `index.html`); get your own at <https://api.data.gov/signup/> if forking.
+- The men's/women's sport filter currently lists the 6 most-sponsored sports per gender (editable via `SPORT_FILTER` in `index.html`).
+- *Browsing tip:* pick a **state** when filtering by division/sport (the API returns a state's 4-year schools, which are then filtered locally).
 
 ### 7. Save or share
 - **Export results (CSV)** — the GPA/eligibility summary (includes ACT/SAT and NAIA status).

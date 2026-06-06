@@ -93,6 +93,7 @@
   .badge.likely{background:var(--greenbg);color:var(--green);border:1px solid var(--green)}
   .badge.target{background:var(--amberbg);color:var(--amber);border:1px solid var(--amber)}
   .badge.reach{background:var(--redbg);color:var(--red);border:1px solid var(--red)}
+  .badge.divb{background:var(--navy);color:#fff;border:1px solid var(--navy)}
 </style>
 </head>
 <body>
@@ -149,7 +150,7 @@
     <p>Add upcoming courses with the <b>Plan?</b> box checked (or use <span class="tag">+ Add planned (senior) course</span>). Then use the <b>View</b> toggle above the results to switch between <b>Completed only</b> and <b>Projected (incl. planned)</b> to see where the GPA is headed at graduation.</p>
 
     <h3>6 · Explore colleges (optional)</h3>
-    <p>In the <b>College search &amp; match</b> card, search by school name, state, and/or major. Each result shows <b>cost</b> (net price &amp; tuition), <b>admission rate</b>, and the school's <b>SAT/ACT middle-50%</b> ranges, with a link to the school. If you've entered ACT/SAT above, you'll also get an <b>academic match</b> badge — <span class="tag likely">Likely</span> <span class="tag target">Target</span> <span class="tag reach">Reach</span> — based on how your scores compare to that school's ranges and selectivity. It's an <i>estimate</i>, not a guarantee (recruited athletes may get extra admissions support). Data is the federal College Scorecard; only your search terms are sent — your scores stay in your browser.</p>
+    <p>In the <b>College search &amp; match</b> card, search by school name, state, and/or major, and narrow by <b>NCAA/NAIA division</b> (D-I / D-II / D-III / NAIA) and by a <b>men's or women's sport</b> the school sponsors (e.g. only NAIA schools in Ohio with men's soccer). Each result is labeled with its <b>division</b> and shows <b>cost</b> (net price &amp; tuition), <b>admission rate</b>, and the school's <b>SAT/ACT middle-50%</b> ranges, with a link to the school. Tip: pick a <b>state</b> first when browsing by division/sport. If you've entered ACT/SAT above, you'll also get an <b>academic match</b> badge — <span class="tag likely">Likely</span> <span class="tag target">Target</span> <span class="tag reach">Reach</span> — based on how your scores compare to that school's ranges and selectivity. It's an <i>estimate</i>, not a guarantee (recruited athletes may get extra admissions support). Data is the federal College Scorecard; only your search terms are sent — your scores stay in your browser.</p>
 
     <h3>7 · Save or share</h3>
     <ul>
@@ -338,12 +339,14 @@
   <div class="card">
     <h2>🎓 College search &amp; match <span class="small" style="font-weight:normal;color:var(--muted)">(majors · cost · academic fit)</span></h2>
     <div class="row noprint" style="gap:10px">
-      <input id="cSchool" placeholder="School name (e.g. Ohio State)" style="flex:1;min-width:180px" onkeydown="if(event.key==='Enter')searchColleges()">
-      <select id="cState" style="width:130px"></select>
-      <select id="cMajor" style="width:200px"></select>
+      <input id="cSchool" placeholder="School name (e.g. Ohio State)" style="flex:1;min-width:160px" onkeydown="if(event.key==='Enter')searchColleges()">
+      <select id="cState" style="width:120px"></select>
+      <select id="cMajor" style="width:190px"></select>
+      <select id="cDivision" style="width:150px"></select>
+      <select id="cSport" style="width:175px"></select>
       <button class="sec" onclick="searchColleges()">Search</button>
     </div>
-    <p class="note">Live data from the U.S. Dept. of Education <b>College Scorecard</b>. The <b>academic match</b> uses the ACT/SAT you entered in the Test scores card — your grades/scores stay in your browser; only the school search terms are sent. <b>NCAA/NAIA athletic-association filtering is planned for a later update.</b></p>
+    <p class="note">Live data from the U.S. Dept. of Education <b>College Scorecard</b>; NCAA/NAIA <b>division</b> &amp; <b>sport</b> data from the federal <b>EADA</b> survey (2024-25). The <b>academic match</b> uses the ACT/SAT you entered above — your grades/scores stay in your browser; only the school search terms are sent. Tip: pick a <b>state</b> (or name) to browse, then narrow by division or sport.</p>
     <div id="cResults" style="margin-top:8px"></div>
     <p class="note"><b>Academic match is an estimate, not a guarantee.</b> Likely / Target / Reach compares your test scores to each school’s published middle-50% ranges and admission rate. Real decisions weigh GPA, essays, recommendations and more, and recruited athletes may receive admissions support — always confirm with the college and a counselor.</p>
   </div>
@@ -523,6 +526,15 @@ const SC_MAJOR_GROUPS=[
 ];
 const SC_MAJOR_LABEL={};
 SC_MAJOR_GROUPS.forEach(([grp,fam,items])=>{ if(fam) SC_MAJOR_LABEL['fam:'+fam]='All '+grp; items.forEach(([lbl,code])=>SC_MAJOR_LABEL['cip:'+code]=lbl); });
+// Athletics (EADA) — division + sport sponsorship by IPEDS unitid (= Scorecard id)
+const SC_SPORTS=['Basketball','Football','Baseball','Softball','Soccer','Volleyball','Golf','Tennis','Cross Country / Track','Swimming & Diving','Wrestling','Lacrosse','Field Hockey'];
+const SC_DIV_LABEL={DI:'NCAA D-I',DII:'NCAA D-II',DIII:'NCAA D-III',NAIA:'NAIA'};
+// Top-6 most-sponsored sports per gender for the filter (editable)
+const SPORT_FILTER={m:['Football','Basketball','Baseball','Soccer','Cross Country / Track','Golf'],
+                    w:['Basketball','Volleyball','Softball','Soccer','Cross Country / Track','Golf']};
+let ATH={schools:{}};
+function loadAthletics(){ fetch('athletics.json').then(r=>r.json()).then(d=>{ATH=d;}).catch(()=>{}); }
+function athOf(id){ return ATH.schools? ATH.schools[String(id)] : null; }
 const SC_STATES=['AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY'];
 let _scRows=null,_scMajor='';
 function initCollege(){
@@ -537,6 +549,14 @@ function initCollege(){
       h+='</optgroup>';
     }
     mj.innerHTML=h;
+  }
+  const dv=document.getElementById('cDivision');
+  if(dv && !dv.options.length) dv.innerHTML='<option value="">Any division</option>'+['DI','DII','DIII','NAIA'].map(d=>`<option value="${d}">${SC_DIV_LABEL[d]}</option>`).join('');
+  const sp=document.getElementById('cSport');
+  if(sp && !sp.options.length){
+    let h='<option value="">Any sport</option><optgroup label="Men\'s">'+SPORT_FILTER.m.map(s=>`<option value="m:${s}">Men's ${s}</option>`).join('')+'</optgroup>';
+    h+='<optgroup label="Women\'s">'+SPORT_FILTER.w.map(s=>`<option value="w:${s}">Women's ${s}</option>`).join('')+'</optgroup>';
+    sp.innerHTML=h;
   }
 }
 function majorLabel(key){ return SC_MAJOR_LABEL[key]||'Major'; }
@@ -560,7 +580,7 @@ async function searchColleges(){
   if(name) p.set('school.name',name);
   if(state) p.set('school.state',state);
   if(cip) p.set('latest.programs.cip_4_digit.code',cip);
-  p.set('school.operating','1'); p.set('fields',fields.join(',')); p.set('per_page','50');
+  p.set('school.operating','1'); p.set('school.degrees_awarded.predominant__range','3..4'); p.set('fields',fields.join(',')); p.set('per_page','100');
   try{
     const res=await fetch(SC_BASE+'?'+p.toString());
     if(!res.ok) throw new Error('HTTP '+res.status+(res.status===429?' — API rate limit reached; try again shortly':''));
@@ -569,6 +589,11 @@ async function searchColleges(){
     // keep 4-year (bachelor's+) institutions — the NCAA/NAIA universe
     rows=rows.filter(r=>(+r['school.degrees_awarded.highest']||0)>=3);
     if(famKey){ const k='latest.academics.program_percentage.'+famKey; rows=rows.filter(r=>(+r[k]||0)>0); }
+    // athletics filters (EADA): division + sport
+    const wantDiv=val('cDivision'), wantSport=val('cSport');
+    if(wantDiv) rows=rows.filter(r=>{const a=athOf(r['id']); return a && a[0]===wantDiv;});
+    if(wantSport){ const [g,nm]=wantSport.split(':'); const bit=SC_SPORTS.indexOf(nm);
+      rows=rows.filter(r=>{const a=athOf(r['id']); if(!a)return false; const mask=g==='m'?a[1]:a[2]; return (mask&(1<<bit))!==0;}); }
     rows.sort((a,b)=>(+b['latest.student.size']||0)-(+a['latest.student.size']||0));
     renderColleges(rows.slice(0,20), major);
   }catch(e){ box.innerHTML='<p class="note" style="color:var(--red)">Search failed: '+esc(e.message)+'. Check your connection or try again.</p>'; }
@@ -607,10 +632,14 @@ function renderColleges(rows, major){
     const famKey = major.startsWith('fam:')?major.slice(4):null;
     const majShare = famKey? r['latest.academics.program_percentage.'+famKey]:null;
     const offersCip = major.startsWith('cip:');
+    const a=athOf(r['id']); const divLbl=a?SC_DIV_LABEL[a[0]]:null;
     return `<div class="college">
       <div class="top">
         <div class="nm">${link?`<a href="${link}" target="_blank" rel="noopener">${esc(r['school.name'])} ↗</a>`:esc(r['school.name'])}</div>
-        <span class="badge ${mcls}"${mtip?` title="${esc(mtip)}"`:''}>${ml?('Match: '+ml):mtip}</span>
+        <span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+          ${divLbl?`<span class="badge divb" title="Athletic classification (EADA 2024-25)">${divLbl}</span>`:''}
+          <span class="badge ${mcls}"${mtip?` title="${esc(mtip)}"`:''}>${ml?('Match: '+ml):mtip}</span>
+        </span>
       </div>
       <div class="meta">
         <span>${esc(r['school.city']||'')}, ${esc(r['school.state']||'')}</span>
@@ -731,6 +760,7 @@ document.querySelectorAll('.settings input').forEach(el=>el.addEventListener('in
 load();
 loadTests();
 initCollege();
+loadAthletics();
 if(!data.length) data=[blankRow(),blankRow(),blankRow()];
 render();
 </script>
