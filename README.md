@@ -5,7 +5,8 @@ grading scale and computes:
 
 - **Overall GPA** — 7-pt vs 10-pt, unweighted and weighted (Honors/AP bonus)
 - **NCAA core-course GPA** — core academics only, unweighted, with live **Division I (≥2.3)** and **Division II (≥2.2)** PASS/FAIL checks
-- **NAIA GPA** — overall GPA vs the **2.3** benchmark (one leg of NAIA's "2 of 3" rule)
+- **NAIA eligibility** — evaluates the **"2 of 3"** rule using overall GPA, **ACT/SAT test scores**, and (informationally) class rank
+- **ACT / SAT input** — feeds NAIA's test leg (ACT ≥ 18 / SAT ≥ 970). *The NCAA dropped test scores from DI/DII initial eligibility in 2023, so they don't affect the NCAA result — the app notes this.*
 - **Senior-year projection** — flag planned courses and toggle between *Completed only* and *Projected at graduation*
 
 Everything runs **client-side** — no server, no data leaves the browser. Suitable for student
@@ -54,18 +55,22 @@ Open **Grading scale settings** and set the cutoffs to match your school exactly
 common 7-point (A ≥ 93) and 10-point (A ≥ 90) scales. You can also set the Honors/AP bonus and the
 DI / DII / NAIA pass thresholds here.
 
-### 3. Read the results
+### 3. Add test scores (optional)
+In the **Test scores** card, enter the **ACT composite** and/or **SAT total**. These feed the **NAIA** check.
+**Note:** the NCAA no longer uses ACT/SAT for DI/DII initial eligibility (permanent since 2023), so scores don't change the NCAA result — the app states this inline.
+
+### 4. Read the results
 - **Overall GPA** — your full GPA on both scales, unweighted and weighted (green = the 10-point result).
 - **NCAA Core GPA** — core-academic courses only, no weighting; badges show pass/fail vs **DI ≥ 2.3** and **DII ≥ 2.2**, and it tracks progress toward the 16 required core units.
-- **NAIA GPA** — your overall GPA vs the **2.3** benchmark (one of NAIA's "2 of 3" requirements).
+- **NAIA Eligibility** — the **"2 of 3"** rule: overall GPA ≥ 2.3, test leg (**ACT ≥ 18 / SAT ≥ 970**), or top-50% class rank. Two legs met → **QUALIFIES**; one leg met → still needs the top-50% rank leg.
 
-### 4. Project the senior year (optional)
+### 5. Project the senior year (optional)
 Add upcoming courses with the **Plan?** box checked (or use **+ Add planned (senior) course**). Then
 use the **View** toggle above the results to switch between **Completed only** and
 **Projected (incl. planned)** to see where the GPA is headed at graduation.
 
-### 5. Save or share
-- **Export results (CSV)** — the GPA/eligibility summary.
+### 6. Save or share
+- **Export results (CSV)** — the GPA/eligibility summary (includes ACT/SAT and NAIA status).
 - **Export courses (CSV)** — your course list, to reopen later.
 - **Print / Save as PDF** — a clean printout for a counselor or coach.
 

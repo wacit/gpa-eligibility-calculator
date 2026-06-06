@@ -119,23 +119,26 @@
       <li><b>%</b> — the percentage grade (e.g. <code>88</code>). The letter grade is figured automatically.</li>
       <li><b>Credit hrs</b> — used for the overall GPA. Enter <code>0</code> for a failed/no-credit class if your school gives no credit for it.</li>
       <li><b>Track</b> — <code>Regular</code>, <code>Honors</code>, or <code>AP</code>. Only affects the <i>weighted</i> overall GPA (NCAA/NAIA ignore weighting).</li>
-      <li><b>Plan?</b> — check this for <b>future/senior-year</b> courses you're projecting (see step 4).</li>
+      <li><b>Plan?</b> — check this for <b>future/senior-year</b> courses you're projecting (see step 5).</li>
     </ul>
 
     <h3>2 · Match your school's grading scale</h3>
     <p>Open <b>Grading scale settings</b> and set the cutoffs to match your school exactly. Defaults are the common 7-point (A≥93) and 10-point (A≥90) scales. You can also set the Honors/AP bonus and the NCAA/NAIA pass thresholds here.</p>
 
-    <h3>3 · Read the results</h3>
+    <h3>3 · Add test scores (optional)</h3>
+    <p>In the <b>Test scores</b> card, enter the student's <b>ACT composite</b> and/or <b>SAT total</b>. These feed the <b>NAIA</b> check below. <i>Note:</i> the <b>NCAA dropped ACT/SAT</b> from DI/DII initial eligibility (permanent since 2023), so scores don't change the NCAA result.</p>
+
+    <h3>4 · Read the results</h3>
     <ul>
       <li><b>Overall GPA</b> — your full GPA on both scales, unweighted and weighted. Green = the 10-point (new) result.</li>
       <li><b>NCAA Core GPA</b> — uses core-academic courses only, no weighting. The badges show pass/fail vs <span class="tag pass">DI ≥2.3</span> and <span class="tag pass">DII ≥2.2</span>, and it tracks progress toward the 16 required core units.</li>
-      <li><b>NAIA GPA</b> — your overall GPA vs the <b>2.3</b> benchmark (one of NAIA's "2 of 3" requirements).</li>
+      <li><b>NAIA Eligibility</b> — checks the <b>"2 of 3"</b> rule: overall GPA ≥ 2.3, test leg (<b>ACT ≥ 18 / SAT ≥ 970</b>), or top-50% class rank. If two are met it shows <span class="tag pass">QUALIFIES</span>; if only the GPA or test leg is met it shows it still needs the top-50% rank leg.</li>
     </ul>
 
-    <h3>4 · Project the senior year (optional)</h3>
+    <h3>5 · Project the senior year (optional)</h3>
     <p>Add upcoming courses with the <b>Plan?</b> box checked (or use <span class="tag">+ Add planned (senior) course</span>). Then use the <b>View</b> toggle above the results to switch between <b>Completed only</b> and <b>Projected (incl. planned)</b> to see where the GPA is headed at graduation.</p>
 
-    <h3>5 · Save or share</h3>
+    <h3>6 · Save or share</h3>
     <ul>
       <li><span class="tag">Export results (CSV)</span> — the GPA/eligibility summary.</li>
       <li><span class="tag">Export courses (CSV)</span> — your course list to reopen later.</li>
@@ -209,6 +212,17 @@
     </details>
   </div>
 
+  <!-- Test scores -->
+  <div class="card">
+    <h2>🎯 Test scores <span class="small" style="font-weight:normal;color:var(--muted)">(optional — used for NAIA)</span></h2>
+    <div class="row" style="gap:20px;align-items:flex-end">
+      <label class="small">ACT composite (1–36)<br><input type="number" id="act" min="1" max="36" placeholder="—" style="width:96px" oninput="saveTests();compute()"></label>
+      <label class="small">SAT total (400–1600)<br><input type="number" id="sat" min="400" max="1600" step="10" placeholder="—" style="width:116px" oninput="saveTests();compute()"></label>
+      <span id="testLeg" style="margin-bottom:4px"></span>
+    </div>
+    <p class="note">NAIA's test leg is met with <b>ACT ≥ 18</b> or <b>SAT ≥ 970</b> (SAT = Evidence-Based Reading/Writing + Math). <b>The NCAA no longer uses ACT/SAT</b> for DI/DII initial eligibility (test-optional became permanent in 2023), so scores don't change the NCAA result.</p>
+  </div>
+
   <!-- STEP 3: results -->
   <div class="card">
     <h2><span class="n">3</span>Results</h2>
@@ -241,16 +255,17 @@
           <div><b>10-pt:</b> <span id="b10di"></span><span id="b10dii"></span></div>
         </div>
         <p class="note" id="ncaaUnitsNote"></p>
+        <p class="note">ACT/SAT are <b>not</b> used for NCAA DI/DII initial eligibility (test-optional became permanent in 2023) — qualification depends on core-course GPA and the 16-core-course rules.</p>
       </div>
 
       <div class="res">
-        <h3>NAIA GPA <span class="small">(overall, 4.0)</span></h3>
+        <h3>NAIA Eligibility <span class="small">(2 of 3 rule)</span></h3>
         <table>
-          <tr><th class="l">Scale</th><th>GPA</th><th>Status</th></tr>
-          <tr><td class="l">7-point</td><td id="na7">–</td><td id="na7b"></td></tr>
-          <tr><td class="l">10-point</td><td id="na10" class="up">–</td><td id="na10b"></td></tr>
+          <tr><th class="l">Scale</th><th>Overall GPA</th><th>GPA leg</th><th>NAIA status</th></tr>
+          <tr><td class="l">7-point</td><td id="na7">–</td><td id="na7g"></td><td id="na7b"></td></tr>
+          <tr><td class="l">10-point</td><td id="na10" class="up">–</td><td id="na10g"></td><td id="na10b"></td></tr>
         </table>
-        <p class="note">NAIA uses the <b>overall</b> GPA (not a core GPA). The GPA leg is one of NAIA’s “2 of 3” requirements (GPA ≥ 2.3, OR test score, OR top-50% class rank).</p>
+        <p class="note">Meet <b>2 of 3</b>: overall GPA ≥ <span id="naiaMinL">2.3</span>, test leg (ACT ≥ 18 / SAT ≥ 970), or top-50% class rank. Enter a test score above to evaluate the test leg; class rank isn’t entered here, so it’s shown as the remaining option.</p>
       </div>
     </div>
     <div class="row noprint" style="margin-top:14px">
@@ -364,9 +379,20 @@ function compute(){
   const unitsHave=Math.max(n7u,n10u);
   set('ncaaUnitsNote', `${unitsHave.toFixed(1)} core units entered (16 required by graduation). ` + (unitsHave<16?'More core courses still needed.':'Meets the 16-unit count.'));
 
-  // NAIA uses overall (unweighted) GPA
+  // NAIA: overall (unweighted) GPA + ACT/SAT "2 of 3" rule
+  const naiaMin=num('naiaMin'), act=num('act'), sat=num('sat');
+  const testEntered = act>0 || sat>0;
+  const testPass = act>=18 || sat>=970;
+  set('naiaMinL', naiaMin);
+  const tl=document.getElementById('testLeg');
+  if(tl){
+    if(!testEntered) tl.innerHTML='<span class="badge pend">Test leg: no score entered</span>';
+    else { const parts=[]; if(act)parts.push('ACT '+act); if(sat)parts.push('SAT '+sat);
+      tl.innerHTML=`<span class="badge ${testPass?'pass':'fail'}">Test leg: ${testPass?'MET':'NOT met'} · ${parts.join(' / ')}</span>`; }
+  }
   set('na7', oh?f(o7u/oh):'–'); set('na10', oh?f(o10u/oh):'–');
-  naia('na7b', oh?o7u/oh:null); naia('na10b', oh?o10u/oh:null);
+  naiaRow('na7g','na7b', oh?o7u/oh:null, naiaMin, testEntered, testPass);
+  naiaRow('na10g','na10b', oh?o10u/oh:null, naiaMin, testEntered, testPass);
 
   const vi=document.getElementById('viewInfo');
   if(vi) vi.textContent = planned
@@ -380,12 +406,22 @@ function badge(id,gpa,min,label){
   const ok=gpa>=min;
   el.innerHTML=`<span class="badge ${ok?'pass':'fail'}">${label} ${ok?'PASS':'FAIL'} (≥${min})</span>`;
 }
-function naia(id,gpa){
-  const el=document.getElementById(id);
-  if(gpa==null){ el.innerHTML=''; return; }
-  const min=num('naiaMin'), ok=gpa>=min;
-  el.innerHTML=`<span class="badge ${ok?'pass':'fail'}">${ok?'MEETS':'BELOW'} ${min} leg</span>`;
+function naiaRow(gId,bId,gpa,min,testEntered,testPass){
+  const g=document.getElementById(gId), b=document.getElementById(bId);
+  if(!g||!b) return;
+  if(gpa==null){ g.innerHTML=''; b.innerHTML=''; return; }
+  const gpaPass=gpa>=min;
+  g.innerHTML=`<span class="badge ${gpaPass?'pass':'fail'}">${gpaPass?'MET':'not met'}</span>`;
+  const legs=(gpaPass?1:0)+(testPass?1:0);
+  let cls,txt;
+  if(legs>=2){ cls='pass'; txt='QUALIFIES (2 of 3)'; }
+  else if(legs===1){ cls='pend'; txt='1 of 3 — needs top-50% rank'; }
+  else { cls='fail'; txt = testEntered ? 'GPA & test not met' : 'GPA not met'; }
+  b.innerHTML=`<span class="badge ${cls}">${txt}</span>`;
 }
+function saveTests(){ try{ localStorage.setItem('naiaTests', JSON.stringify({act:val('act'),sat:val('sat')})); }catch(e){} }
+function loadTests(){ try{ const s=JSON.parse(localStorage.getItem('naiaTests')||'{}'); if(s.act)document.getElementById('act').value=s.act; if(s.sat)document.getElementById('sat').value=s.sat; }catch(e){} }
+function val(id){ return document.getElementById(id).value; }
 
 /* ---------- CSV ---------- */
 const HEADERS=["Term","Course","Category","Percent","CreditHours","Track","Planned"];
@@ -404,13 +440,18 @@ function exportCourses(){
 }
 function exportResults(){
   const g=(id)=>document.getElementById(id).textContent;
+  const t=(id)=>{const e=document.getElementById(id);return e&&e.innerText?e.innerText.trim():'';};
   const rows=[
     ['Metric','7-point','10-point'].join(','),
     ['Overall GPA (unweighted)',g('ov7u'),g('ov10u')].join(','),
     ['Overall GPA (weighted)',g('ov7w'),g('ov10w')].join(','),
     ['NCAA core GPA',g('nc7'),g('nc10')].join(','),
     ['NCAA core units',g('nu7'),g('nu10')].join(','),
-    ['NAIA overall GPA',g('na7'),g('na10')].join(',')
+    ['NAIA overall GPA',g('na7'),g('na10')].join(','),
+    ['NAIA status (2 of 3)',t('na7b'),t('na10b')].join(','),
+    ['ACT composite',csvCell(val('act')||'-'),''].join(','),
+    ['SAT total',csvCell(val('sat')||'-'),''].join(','),
+    ['Test leg (NAIA)',csvCell(t('testLeg')),''].join(',')
   ];
   dl('eligibility_results.csv', rows.join('\n'));
 }
@@ -483,6 +524,7 @@ function r(term,course,cat,pct,hrs,track){ return {term,course,cat,pct:''+pct,hr
 document.querySelectorAll('.settings input').forEach(el=>el.addEventListener('input',compute));
 
 load();
+loadTests();
 if(!data.length) data=[blankRow(),blankRow(),blankRow()];
 render();
 </script>
