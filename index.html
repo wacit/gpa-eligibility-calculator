@@ -9,15 +9,21 @@
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <meta name="theme-color" content="#1f4e78">
+<script>(function(){try{var t=localStorage.getItem('theme')||((window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 <style>
   :root{
     --navy:#1f4e78; --navy2:#2e6da4; --bg:#f4f6f9; --card:#fff; --line:#dfe4ea;
     --green:#1e7d34; --greenbg:#e6f4ea; --red:#b3261e; --redbg:#fbe9e7; --amber:#8a6d00; --amberbg:#fff7e0;
-    --ink:#1f2733; --muted:#6b7280;
+    --ink:#1f2733; --muted:#6b7280; --soft:#fcfdff; --th-bg:#eef3f8; --input-bg:#fff;
+  }
+  [data-theme="dark"]{
+    --navy:#5e9fd4; --navy2:#3f7cb3; --bg:#0f141a; --card:#172029; --line:#2c3a48;
+    --green:#5fd38a; --greenbg:#14361f; --red:#ff8d83; --redbg:#3a1714; --amber:#e7c759; --amberbg:#37300a;
+    --ink:#e6edf3; --muted:#9aa7b4; --soft:#121a22; --th-bg:#1d2935; --input-bg:#1d2935;
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:-apple-system,Segoe UI,Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
-  header{background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:22px 20px}
+  header{background:linear-gradient(135deg,#1f4e78,#2e6da4);color:#fff;padding:22px 20px}
   .hbar{display:flex;align-items:center;gap:16px;max-width:1100px;margin:0 auto}
   .hbar img.mark{width:54px;height:54px;border-radius:12px;flex:none;box-shadow:0 2px 6px rgba(0,0,0,.25)}
   .hbar .htext{flex:1;min-width:0}
@@ -32,19 +38,19 @@
   .card h2 .n{background:var(--navy);color:#fff;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-size:.85rem}
   .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
   button{font:inherit;border:1px solid var(--navy);background:var(--navy);color:#fff;padding:8px 14px;border-radius:7px;cursor:pointer}
-  button.sec{background:#fff;color:var(--navy)}
-  button.ghost{background:#fff;color:var(--muted);border-color:var(--line)}
+  button.sec{background:var(--card);color:var(--navy)}
+  button.ghost{background:var(--card);color:var(--muted);border-color:var(--line)}
   button:hover{filter:brightness(1.05)}
   table{border-collapse:collapse;width:100%;font-size:.9rem}
   th,td{border:1px solid var(--line);padding:6px 8px;text-align:center}
-  th{background:#eef3f8;color:var(--navy);position:sticky;top:0}
+  th{background:var(--th-bg);color:var(--navy);position:sticky;top:0}
   td.l,th.l{text-align:left}
-  input,select{font:inherit;padding:5px 6px;border:1px solid var(--line);border-radius:6px;width:100%;background:#fff}
+  input,select{font:inherit;padding:5px 6px;border:1px solid var(--line);border-radius:6px;width:100%;background:var(--input-bg);color:var(--ink)}
   input.pct{width:64px}
   .tablewrap{overflow:auto;max-height:430px;border:1px solid var(--line);border-radius:8px}
-  .del{color:var(--red);border-color:var(--red);background:#fff;padding:3px 8px}
+  .del{color:var(--red);border-color:var(--red);background:var(--card);padding:3px 8px}
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
-  .res{border:1px solid var(--line);border-radius:10px;padding:14px;background:#fcfdff}
+  .res{border:1px solid var(--line);border-radius:10px;padding:14px;background:var(--soft)}
   .res h3{margin:0 0 8px;font-size:1rem;color:var(--navy)}
   .big{font-size:2rem;font-weight:700;line-height:1}
   .vs{display:flex;gap:18px;margin:6px 0}
@@ -74,17 +80,17 @@
   .helpbtn:hover{background:rgba(255,255,255,.28)}
   .modal{position:fixed;inset:0;background:rgba(15,23,35,.55);display:none;align-items:flex-start;justify-content:center;z-index:1000;padding:24px;overflow:auto}
   .modal.open{display:flex}
-  .modal .box{background:#fff;max-width:760px;width:100%;border-radius:12px;padding:26px 30px;box-shadow:0 12px 40px rgba(0,0,0,.3);margin:auto}
+  .modal .box{background:var(--card);color:var(--ink);max-width:760px;width:100%;border-radius:12px;padding:26px 30px;box-shadow:0 12px 40px rgba(0,0,0,.3);margin:auto}
   .modal h2{color:var(--navy);margin:0 0 4px}
   .modal h3{color:var(--navy);margin:20px 0 6px;font-size:1.02rem}
   .modal ol,.modal ul{margin:6px 0 6px 0;padding-left:20px}
   .modal li{margin:5px 0}
   .modal .close{position:sticky;top:0;float:right;border:none;background:var(--navy);color:#fff;border-radius:50%;width:32px;height:32px;font-size:1.1rem;line-height:1;cursor:pointer}
-  .modal code{background:#eef3f8;padding:1px 5px;border-radius:4px;font-size:.88em}
-  .modal .tag{display:inline-block;background:#eef3f8;color:var(--navy);border-radius:6px;padding:1px 7px;font-size:.82rem;font-weight:600;margin:1px}
+  .modal code{background:var(--th-bg);padding:1px 5px;border-radius:4px;font-size:.88em}
+  .modal .tag{display:inline-block;background:var(--th-bg);color:var(--navy);border-radius:6px;padding:1px 7px;font-size:.82rem;font-weight:600;margin:1px}
   .modal .pass{background:var(--greenbg);color:var(--green)} .modal .fail{background:var(--redbg);color:var(--red)}
   .modal .tag.likely{background:var(--greenbg);color:var(--green)} .modal .tag.target{background:var(--amberbg);color:var(--amber)} .modal .tag.reach{background:var(--redbg);color:var(--red)}
-  .college{border:1px solid var(--line);border-radius:9px;padding:10px 12px;margin:8px 0;background:#fcfdff}
+  .college{border:1px solid var(--line);border-radius:9px;padding:10px 12px;margin:8px 0;background:var(--soft)}
   .college .top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
   .college .nm{font-weight:700;color:var(--navy)}
   .college .nm a{color:var(--navy)}
@@ -105,7 +111,10 @@
       <p>Converts grades on a <b>7-point</b> and <b>10-point</b> scale · computes <b>NCAA</b> core GPA (DI/DII) and <b>NAIA</b> GPA · 100% in your browser — no data leaves this device.</p>
       <span class="brandtag">Warren Anderson Consulting LLC</span>
     </div>
-    <button class="helpbtn" onclick="openHelp()">❓ How to use</button>
+    <div style="display:flex;flex-direction:column;gap:6px;align-self:flex-start">
+      <button class="helpbtn" onclick="openHelp()">❓ How to use</button>
+      <button class="helpbtn" id="themeBtn" onclick="toggleTheme()" title="Toggle light / dark mode">🌙 Dark</button>
+    </div>
   </div>
 </header>
 
@@ -371,6 +380,9 @@
 
 <script>
 document.getElementById('yr').textContent = new Date().getFullYear();
+function applyTheme(t){ document.documentElement.setAttribute('data-theme',t); try{localStorage.setItem('theme',t);}catch(e){} const b=document.getElementById('themeBtn'); if(b) b.textContent=t==='dark'?'☀️ Light':'🌙 Dark'; const m=document.querySelector('meta[name=theme-color]'); if(m) m.setAttribute('content', t==='dark'?'#0f141a':'#1f4e78'); }
+function toggleTheme(){ const cur=document.documentElement.getAttribute('data-theme')==='dark'?'dark':'light'; applyTheme(cur==='dark'?'light':'dark'); }
+applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'dark':'light');
 function openHelp(){ document.getElementById('helpModal').classList.add('open'); }
 function closeHelp(){ document.getElementById('helpModal').classList.remove('open'); }
 function openImport(){ document.getElementById('importModal').classList.add('open'); }
@@ -560,7 +572,7 @@ function initCollege(){
     sp.innerHTML=h;
   }
   const rc=document.getElementById('cResultCount');
-  if(rc && !rc.options.length) rc.innerHTML=[25,50,100].map(n=>`<option value="${n}">Show ${n}</option>`).join('');
+  if(rc && !rc.options.length) rc.innerHTML=[25,50,100,250].map(n=>`<option value="${n}"${n===50?' selected':''}>Show ${n===250?'all':n}</option>`).join('');
 }
 function majorLabel(key){ return SC_MAJOR_LABEL[key]||'Major'; }
 async function searchColleges(){

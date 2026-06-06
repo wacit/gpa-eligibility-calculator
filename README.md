@@ -9,6 +9,7 @@ grading scale and computes:
 - **ACT / SAT input** — feeds NAIA's test leg (ACT ≥ 18 / SAT ≥ 970). *The NCAA dropped test scores from DI/DII initial eligibility in 2023, so they don't affect the NCAA result — the app notes this.*
 - **College search & match** — live search of U.S. colleges (federal **College Scorecard**) by name / state / major, with **NCAA/NAIA division** labels and **division + men's/women's sport filters** (federal **EADA** data), showing **cost, admission rate, SAT/ACT ranges**, plus an **academic match** (Likely / Target / Reach) based on the ACT/SAT entered
 - **Senior-year projection** — flag planned courses and toggle between *Completed only* and *Projected at graduation*
+- **Light / dark mode** — toggle in the header; remembers your choice and follows your system preference by default
 
 Everything runs **client-side** — no server, no data leaves the browser. Suitable for student
 records (FERPA-friendly).
