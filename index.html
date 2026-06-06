@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GPA & Athletic Eligibility Calculator (7-pt / 10-pt · NCAA · NAIA)</title>
+<meta name="version" content="v2.1 · June 2026">
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
@@ -75,6 +76,24 @@
     .card{break-inside:avoid}
     body{background:#fff}
     .helpbtn,.modal{display:none!important}
+  }
+  /* Mobile responsive */
+  @media(max-width:600px){
+    header h1{font-size:1.1rem}
+    .hbar img.mark{width:38px;height:38px}
+    .helpbtn{padding:6px 10px;font-size:.82rem}
+    .grid{grid-template-columns:1fr}
+    .settings{grid-template-columns:1fr 1fr}
+    table{font-size:.8rem}
+    th,td{padding:4px 5px}
+    .row{gap:6px}
+    button{padding:7px 10px;font-size:.85rem}
+    .card{padding:12px 12px}
+    .wrap{padding:12px 10px 40px}
+    .hbar{gap:10px}
+    .modal .box{padding:18px 16px}
+    .col-hide-sm{display:none}
+    input.pct{width:52px}
   }
   .helpbtn{flex:none;align-self:flex-start;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.6);color:#fff;padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:600}
   .helpbtn:hover{background:rgba(255,255,255,.28)}
@@ -262,9 +281,9 @@
     <div class="tablewrap">
       <table id="grid">
         <thead><tr>
-          <th class="l">Term</th><th class="l">Course</th><th>Category</th>
-          <th>%</th><th>Credit&nbsp;hrs</th><th>Track</th>
-          <th>7-pt</th><th>10-pt</th><th class="noprint" title="Check planned / future senior-year courses">Plan?</th><th class="noprint"></th>
+          <th class="l">Term</th><th class="l">Course</th><th class="col-hide-sm">Category</th>
+          <th>%</th><th class="col-hide-sm">Credit&nbsp;hrs</th><th class="col-hide-sm">Track</th>
+          <th class="col-hide-sm">7-pt</th><th>10-pt</th><th class="noprint col-hide-sm" title="Check planned / future senior-year courses">Plan?</th><th class="noprint"></th>
         </tr></thead>
         <tbody id="rows"></tbody>
       </table>
@@ -278,26 +297,26 @@
     <details open><summary>Adjust cutoffs &amp; weighting (defaults shown)</summary>
       <div class="settings" style="margin-top:12px">
         <fieldset><legend>7-point min %</legend>
-          <label>A ≥ <input type="number" id="s7A" value="93"></label>
-          <label>B ≥ <input type="number" id="s7B" value="85"></label>
-          <label>C ≥ <input type="number" id="s7C" value="77"></label>
-          <label>D ≥ <input type="number" id="s7D" value="70"></label>
+          <label>A ≥ <input type="number" id="s7A" value="93" aria-label="7-point A cutoff"></label>
+          <label>B ≥ <input type="number" id="s7B" value="85" aria-label="7-point B cutoff"></label>
+          <label>C ≥ <input type="number" id="s7C" value="77" aria-label="7-point C cutoff"></label>
+          <label>D ≥ <input type="number" id="s7D" value="70" aria-label="7-point D cutoff"></label>
         </fieldset>
         <fieldset><legend>10-point min %</legend>
-          <label>A ≥ <input type="number" id="s10A" value="90"></label>
-          <label>B ≥ <input type="number" id="s10B" value="80"></label>
-          <label>C ≥ <input type="number" id="s10C" value="70"></label>
-          <label>D ≥ <input type="number" id="s10D" value="60"></label>
+          <label>A ≥ <input type="number" id="s10A" value="90" aria-label="10-point A cutoff"></label>
+          <label>B ≥ <input type="number" id="s10B" value="80" aria-label="10-point B cutoff"></label>
+          <label>C ≥ <input type="number" id="s10C" value="70" aria-label="10-point C cutoff"></label>
+          <label>D ≥ <input type="number" id="s10D" value="60" aria-label="10-point D cutoff"></label>
         </fieldset>
         <fieldset><legend>Weighting bonus</legend>
-          <label>Honors + <input type="number" step="0.1" id="bH" value="0.5"></label>
-          <label>AP + <input type="number" step="0.1" id="bAP" value="1.0"></label>
+          <label>Honors + <input type="number" step="0.1" id="bH" value="0.5" aria-label="Honors GPA bonus"></label>
+          <label>AP + <input type="number" step="0.1" id="bAP" value="1.0" aria-label="AP GPA bonus"></label>
         </fieldset>
         <fieldset><legend>NCAA / NAIA</legend>
-          <label>NCAA unit/course <input type="number" step="0.5" id="ncaaUnit" value="0.5"></label>
-          <label>DI min <input type="number" step="0.1" id="diMin" value="2.3"></label>
-          <label>DII min <input type="number" step="0.1" id="diiMin" value="2.2"></label>
-          <label>NAIA min <input type="number" step="0.1" id="naiaMin" value="2.3"></label>
+          <label>NCAA unit/course <input type="number" step="0.5" id="ncaaUnit" value="0.5" aria-label="NCAA credit units per semester course"></label>
+          <label>DI min <input type="number" step="0.1" id="diMin" value="2.3" aria-label="NCAA Division I minimum GPA"></label>
+          <label>DII min <input type="number" step="0.1" id="diiMin" value="2.2" aria-label="NCAA Division II minimum GPA"></label>
+          <label>NAIA min <input type="number" step="0.1" id="naiaMin" value="2.3" aria-label="NAIA minimum GPA"></label>
         </fieldset>
       </div>
       <p class="note">Default 7-point cutoffs use the common A93/B85/C77/D70 scale; adjust to match your school exactly (some, like the sample school, start C at 78). NCAA &amp; NAIA use straight A=4/B=3/C=2/D=1 with <b>no</b> weighting.</p>
@@ -401,7 +420,7 @@
 </div>
 <footer>
   <img src="favicon-32.png" alt="">
-  <span>© <span id="yr"></span> Warren Anderson Consulting LLC · For planning only — verify eligibility with your school and the NCAA Eligibility Center.</span>
+  <span>© <span id="yr"></span> Warren Anderson Consulting LLC · For planning only — verify eligibility with your school and the NCAA Eligibility Center. <span style="opacity:.6">v2.1</span></span>
 </footer>
 
 <script>
@@ -446,15 +465,16 @@ function render(){
     const l10=d.pct!==""?letter(+d.pct,scale10()):"";
     const up=(l7&&l10&&l7!==l10)?'class="up"':'';
     const rn=i+1;
+    const pctWarn = d.pct!==''&&(+d.pct>100||+d.pct<0)?' title="Percent should be 0–100" style="border-color:var(--amber)"':'';
     return `<tr>
       <td class="l"><input value="${esc(d.term)}" oninput="upd(${i},'term',this.value)" aria-label="Term, row ${rn}"></td>
       <td class="l"><input value="${esc(d.course)}" oninput="upd(${i},'course',this.value)" aria-label="Course name, row ${rn}"></td>
-      <td><select onchange="upd(${i},'cat',this.value)" aria-label="Category, row ${rn}">${opt(CATS,d.cat)}</select></td>
-      <td><input class="pct" type="number" value="${d.pct}" oninput="upd(${i},'pct',this.value)" aria-label="Percent grade, row ${rn}"></td>
-      <td><input class="pct" type="number" step="0.5" value="${d.hrs}" oninput="upd(${i},'hrs',this.value)" aria-label="Credit hours, row ${rn}"></td>
-      <td><select onchange="upd(${i},'track',this.value)" aria-label="Course track, row ${rn}">${opt(TRACKS,d.track)}</select></td>
-      <td>${l7}</td><td ${up}>${l10}</td>
-      <td class="noprint"><input type="checkbox" ${d.planned?'checked':''} onchange="updPlanned(${i},this.checked)" style="width:auto" aria-label="Planned senior-year course, row ${rn}"></td>
+      <td class="col-hide-sm"><select onchange="upd(${i},'cat',this.value)" aria-label="Category, row ${rn}">${opt(CATS,d.cat)}</select></td>
+      <td><input class="pct" type="number" min="0" max="100" value="${d.pct}" oninput="upd(${i},'pct',this.value)" aria-label="Percent grade, row ${rn}"${pctWarn}></td>
+      <td class="col-hide-sm"><input class="pct" type="number" min="0" max="10" step="0.5" value="${d.hrs}" oninput="upd(${i},'hrs',this.value)" aria-label="Credit hours, row ${rn}"></td>
+      <td class="col-hide-sm"><select onchange="upd(${i},'track',this.value)" aria-label="Course track, row ${rn}">${opt(TRACKS,d.track)}</select></td>
+      <td class="col-hide-sm">${l7}</td><td ${up}>${l10}</td>
+      <td class="noprint col-hide-sm"><input type="checkbox" ${d.planned?'checked':''} onchange="updPlanned(${i},this.checked)" style="width:auto" aria-label="Planned senior-year course, row ${rn}"></td>
       <td class="noprint"><button class="del" onclick="delRow(${i})" aria-label="Delete row ${rn}">✕</button></td>
     </tr>`;
   }).join('');
