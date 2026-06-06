@@ -7,6 +7,7 @@ grading scale and computes:
 - **NCAA core-course GPA** — core academics only, unweighted, with live **Division I (≥2.3)** and **Division II (≥2.2)** PASS/FAIL checks
 - **NAIA eligibility** — evaluates the **"2 of 3"** rule using overall GPA, **ACT/SAT test scores**, and (informationally) class rank
 - **ACT / SAT input** — feeds NAIA's test leg (ACT ≥ 18 / SAT ≥ 970). *The NCAA dropped test scores from DI/DII initial eligibility in 2023, so they don't affect the NCAA result — the app notes this.*
+- **College search & match** — live search of U.S. colleges (federal **College Scorecard**) by name / state / major, showing **cost, admission rate, SAT/ACT ranges**, plus an **academic match** (Likely / Target / Reach) based on the ACT/SAT entered
 - **Senior-year projection** — flag planned courses and toggle between *Completed only* and *Projected at graduation*
 
 Everything runs **client-side** — no server, no data leaves the browser. Suitable for student
@@ -22,6 +23,10 @@ records (FERPA-friendly).
 | Enter courses | Results & eligibility |
 |:---:|:---:|
 | ![Course entry with sample data](docs/screenshot-overview.png) | ![GPA results with NCAA DI/DII and NAIA checks](docs/screenshot-results.png) |
+
+**College search & match** — live cost, admission rate, SAT/ACT ranges, and a Likely/Target/Reach estimate:
+
+![College search and academic match](docs/screenshot-colleges.png)
 
 Built-in **How to use** guide (opens automatically on first visit):
 
@@ -69,7 +74,14 @@ Add upcoming courses with the **Plan?** box checked (or use **+ Add planned (sen
 use the **View** toggle above the results to switch between **Completed only** and
 **Projected (incl. planned)** to see where the GPA is headed at graduation.
 
-### 6. Save or share
+### 6. Explore colleges (optional)
+In **College search & match**, search by school name, state, and/or major. Each result shows **cost** (net price & tuition), **admission rate**, and **SAT/ACT middle-50%** ranges, with a link to the school. If you entered ACT/SAT, you also get an **academic match** badge — **Likely / Target / Reach** — comparing your scores to the school's ranges and selectivity.
+- *Estimate only*, not a guarantee; recruited athletes may receive extra admissions support.
+- Data: U.S. Dept. of Education **College Scorecard**. Only your search terms are sent — your grades/scores stay in the browser.
+- Uses a free `api.data.gov` key. The app ships with the shared `DEMO_KEY` (heavily rate-limited); for real use, get a free key at <https://api.data.gov/signup/> and replace `SCORECARD_KEY` in `index.html`.
+- *Coming later:* an NCAA/NAIA athletic-association + division filter.
+
+### 7. Save or share
 - **Export results (CSV)** — the GPA/eligibility summary (includes ACT/SAT and NAIA status).
 - **Export courses (CSV)** — your course list, to reopen later.
 - **Print / Save as PDF** — a clean printout for a counselor or coach.
