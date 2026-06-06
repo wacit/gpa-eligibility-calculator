@@ -84,6 +84,7 @@ In **College search & match**, search by school name, state, and/or major, then 
 - Uses a free `api.data.gov` key (`SCORECARD_KEY` in `index.html`); get your own at <https://api.data.gov/signup/> if forking.
 - The men's/women's sport filter currently lists the 6 most-sponsored sports per gender (editable via `SPORT_FILTER` in `index.html`).
 - *Browsing tip:* pick a **state** when filtering by division/sport (the API returns a state's 4-year schools, which are then filtered locally).
+- **Results count:** a **Show 25 / 50 / 100** selector controls how many results display; the search pages through the API as needed to fill it. Filters are an **AND** (a school must match every active filter) — to find one specific school, type its **name** and leave the other filters on "Any."
 
 ### 7. Save or share
 - **Export results (CSV)** — the GPA/eligibility summary (includes ACT/SAT and NAIA status).
