@@ -118,7 +118,7 @@
     <p>List <b>one row per semester grade</b> (the grades that earn credit). Three ways to add them:</p>
     <ul>
       <li><b>Type them in</b> — click <span class="tag">+ Add course</span> and fill each row.</li>
-      <li><b>Import a spreadsheet</b> — click <span class="tag">Download CSV template</span>, fill it in Excel/Google Sheets, then <span class="tag">Import CSV…</span>.</li>
+      <li><b>Import a spreadsheet</b> — click <span class="tag">Download CSV template</span>, fill it in Excel/Google Sheets, then <span class="tag">Import CSV…</span>. Not sure where your grades are? Click <span class="tag">📥 Where's my data?</span> for how to get them out of PowerSchool, Infinite Campus, Skyward, and more.</li>
       <li><b>Try it first</b> — click <span class="tag">Load sample data</span> to see a worked example, then <span class="tag">Clear all</span> when ready.</li>
     </ul>
     <p>What each column means:</p>
@@ -166,6 +166,51 @@
     <p style="text-align:center;margin-top:18px"><button onclick="closeHelp()">Got it — start using the tool</button></p>
   </div>
 </div>
+
+<div class="modal" id="importModal" onclick="if(event.target===this)closeImport()">
+  <div class="box">
+    <button class="close" onclick="closeImport()" title="Close">✕</button>
+    <h2>Getting your grades out of your school's system</h2>
+    <p class="small" style="color:var(--muted)">Most parent/student portals don't have a one-click export, so the fastest reliable source is usually your <b>transcript</b>. Below are the common platforms and where the grades live. Then put one row per semester course into the <b>CSV template</b> (or type them in).</p>
+
+    <h3>⭐ Best source: your transcript</h3>
+    <p>Ask your <b>school counselor or registrar</b> for an <b>unofficial transcript</b> (almost always a free PDF, often same-day). It lists every course, final grade, and credit for all years — exactly what this tool needs. Many schools also post it in <b>Naviance</b> or <b>SCOIR</b>. This beats screen-scraping the portal term by term.</p>
+
+    <h3>PowerSchool (parent / student portal)</h3>
+    <ul>
+      <li>Sign in to your district's portal (usually <code>yourdistrict.powerschool.com</code> or the <b>PowerSchool Mobile</b> app).</li>
+      <li>Click <b>Grades and Attendance</b> for the current term, and <b>Grade History</b> in the left menu for past semesters — Grade History is the best in-portal view of final grades.</li>
+      <li>Click a grade to see the percentage/details if your school enables it.</li>
+      <li>No CSV export in most parent portals — use the on-screen grades to fill the template, or press <b>Ctrl/Cmd&nbsp;+&nbsp;P → Save as PDF</b> to keep a copy.</li>
+    </ul>
+
+    <h3>Infinite Campus (Campus Parent / Student)</h3>
+    <ul>
+      <li>Open <b>Grades</b>; use the term selector to view past semesters.</li>
+      <li>Check <b>Documents</b> or <b>Reports</b> for report cards / transcript PDFs.</li>
+    </ul>
+
+    <h3>Skyward (Family / Student Access)</h3>
+    <ul>
+      <li><b>Gradebook</b> shows current grades; <b>Portfolio</b> holds report cards and the transcript (PDF).</li>
+    </ul>
+
+    <h3>Canvas · Schoology · Google Classroom (LMS)</h3>
+    <ul>
+      <li>These show <b>current course grades only</b>, not full history — open <b>Grades</b> within each course for the live percentage. Use your transcript for past years.</li>
+    </ul>
+
+    <h3>Then: fill the template</h3>
+    <ul>
+      <li>Click <span class="tag">Download CSV template</span> and add one row per <b>semester</b> course: <code>Term, Course, Category, Percent, CreditHours, Track, Planned</code>, then <span class="tag">Import CSV…</span>. Or just <span class="tag">+ Add course</span> and type them.</li>
+      <li><b>Only have letter grades?</b> This tool uses <b>percentages</b>. Enter a number inside that letter's band (e.g. A→95, B→85, C→75), or set your school's exact cutoffs in <b>Grading scale settings</b> and use a representative %.</li>
+      <li>Mark <b>Category</b> correctly so NCAA core courses are counted (electives like Band/PE = "Elective / Non-Core").</li>
+    </ul>
+    <p class="small" style="color:var(--muted)">Tip: if a counselor sends a transcript PDF, you can read off each semester's courses and final grades straight into the template — it's the quickest path for all four years.</p>
+    <p style="text-align:center;margin-top:18px"><button onclick="closeImport()">Got it</button></p>
+  </div>
+</div>
+
 <div class="wrap">
 
   <!-- STEP 1: data -->
@@ -176,6 +221,7 @@
       <button class="sec" onclick="addPlanned()">+ Add planned (senior) course</button>
       <button class="sec" onclick="document.getElementById('csvin').click()">Import CSV…</button>
       <input id="csvin" type="file" accept=".csv,text/csv" style="display:none" onchange="importCSV(this)">
+      <button class="ghost" onclick="openImport()">📥 Where's my data?</button>
       <button class="ghost" onclick="downloadTemplate()">Download CSV template</button>
       <button class="ghost" onclick="loadSample()">Load sample data</button>
       <button class="ghost" onclick="clearAll()">Clear all</button>
@@ -323,7 +369,9 @@
 document.getElementById('yr').textContent = new Date().getFullYear();
 function openHelp(){ document.getElementById('helpModal').classList.add('open'); }
 function closeHelp(){ document.getElementById('helpModal').classList.remove('open'); }
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeHelp(); });
+function openImport(){ document.getElementById('importModal').classList.add('open'); }
+function closeImport(){ document.getElementById('importModal').classList.remove('open'); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeHelp(); closeImport(); } });
 try{ if(!localStorage.getItem('seenHelp')){ openHelp(); localStorage.setItem('seenHelp','1'); } }catch(e){}
 const CORE_CATS = ["English","Math","Science","Social Science","Foreign Language","Other Academic"];
 const CATS = [...CORE_CATS, "Elective / Non-Core"];

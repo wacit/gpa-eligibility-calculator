@@ -43,6 +43,8 @@ List **one row per semester grade** (the grades that earn credit). Three ways to
 - **Import a spreadsheet** — click **Download CSV template**, fill it in Excel/Google Sheets, then **Import CSV…**.
 - **Try it first** — click **Load sample data** to see a worked example, then **Clear all** when ready.
 
+> **Where do I get my grades?** Click **📥 Where's my data?** in the app for step-by-step guidance — see [Getting your grades out of your school's system](#getting-your-grades-out-of-your-schools-system) below.
+
 What each column means:
 
 | Column | What to enter |
@@ -89,6 +91,28 @@ In **College search & match**, search by school name, state, and/or major. Each 
 > **Privacy:** your data is remembered only in *this browser on this device*. **Planning only:**
 > confirm your school's exact scale/weighting and its official NCAA-approved core-course list at the
 > NCAA Eligibility Center — official eligibility is determined by the NCAA/NAIA.
+
+## Getting your grades out of your school's system
+
+Most parent/student portals don't have a one-click export, so the fastest reliable source is usually
+your **transcript**. (The app has this same guide built in — click **📥 Where's my data?**.)
+
+- **⭐ Best source — your transcript.** Ask your **counselor or registrar** for an **unofficial transcript**
+  (almost always a free PDF, often same-day). It lists every course, final grade, and credit for all
+  years — exactly what this tool needs. Many schools also post it in **Naviance** or **SCOIR**.
+- **PowerSchool** (parent/student portal or app) — open **Grades and Attendance** for the current term
+  and **Grade History** for past semesters; click a grade for the percentage. No CSV export in most
+  parent portals, so read the grades into the template or **Ctrl/Cmd + P → Save as PDF**.
+- **Infinite Campus** (Campus Parent/Student) — **Grades** (switch terms); report cards/transcripts under
+  **Documents** or **Reports**.
+- **Skyward** (Family/Student Access) — **Gradebook** for current grades; **Portfolio** for report cards
+  and the transcript.
+- **Canvas / Schoology / Google Classroom** — show **current course grades only**, not full history; use
+  your transcript for past years.
+
+Then fill the **CSV template** (one row per semester course) and **Import CSV…**, or type rows in.
+**Only have letter grades?** This tool uses **percentages** — enter a value inside that letter's band
+(e.g. A→95, B→85, C→75), or set your school's exact cutoffs in **Grading scale settings**.
 
 ## Files
 
