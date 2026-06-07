@@ -488,7 +488,18 @@ Freshman S1,Band,Elective / Non-Core,95,1,Regular,No</pre>
     </div>
     <p class="note">Live data from the U.S. Dept. of Education <b>College Scorecard</b>; NCAA/NAIA <b>division</b> &amp; <b>sport</b> data from the federal <b>EADA</b> survey (2024-25). The <b>academic match</b> uses the ACT/SAT you entered above — your grades/scores stay in your browser; only the school search terms are sent. Tip: pick a <b>state</b> (or name) to browse, then narrow by division or sport.</p>
     <div id="cResults" style="margin-top:8px"></div>
-    <p class="note"><b>Academic match is an estimate, not a guarantee.</b> Likely / Target / Reach compares your test scores to each school’s published middle-50% ranges and admission rate. Real decisions weigh GPA, essays, recommendations and more, and recruited athletes may receive admissions support — always confirm with the college and a counselor.</p>
+    <details class="noprint" style="margin:6px 0 4px">
+      <summary style="cursor:pointer;color:var(--navy);font-weight:600;font-size:.88rem">What do Likely / Target / Reach mean? <span class="small" style="color:var(--muted);font-weight:400">(click to expand)</span></summary>
+      <div class="small" style="margin:8px 0 4px;padding:8px 12px;background:var(--soft);border-left:3px solid var(--navy);border-radius:5px">
+        <p style="margin:2px 0 6px">Each badge compares <b>your ACT/SAT</b> against the school's <b>published middle-50%</b> (the range of admitted students) and adjusts for how selective the school is overall.</p>
+        <p style="margin:4px 0"><span class="badge likely">Match: Likely</span> Your scores are <b>at or above the school's 75th percentile</b> — most admitted students score lower than you. Strong odds, but no guarantee.</p>
+        <p style="margin:4px 0"><span class="badge target">Match: Target</span> Your scores sit <b>inside the school's middle-50%</b> — you look academically competitive. Roughly half of admitted students had scores like yours. A solid bet to apply.</p>
+        <p style="margin:4px 0"><span class="badge reach">Match: Reach</span> Your scores are <b>below the school's 25th percentile</b>, or it admits fewer than 25% of applicants (highly selective). Possible but uncertain — apply only with a balanced college list.</p>
+        <p style="margin:6px 0 2px"><b>Adjustments the badge makes:</b> if the school's admission rate is under 25%, every match shifts one level harder (Likely→Target, Target→Reach). If a school admits 85%+ and your scores aren't below their range, it always shows Likely.</p>
+        <p style="margin:6px 0 2px;color:var(--muted)"><b>Important caveats:</b> this is a quick screen, not a prediction. Admissions also weigh GPA, essays, recommendations, course rigor, demonstrated interest, and (for athletes) <b>coach support</b> — a recruited athlete with coach interest can be admitted to a Reach school they'd otherwise miss. Always cross-check with the college and your counselor.</p>
+      </div>
+    </details>
+    <p class="note"><b>Academic match is an estimate, not a guarantee.</b> Real admissions decisions weigh GPA, essays, recommendations and coach support (for athletes) — always confirm with the college and a counselor.</p>
   </div>
 
   <div class="card">
@@ -882,7 +893,12 @@ const SC_MAJOR_LABEL={};
 SC_MAJOR_GROUPS.forEach(([grp,fam,items])=>{ if(fam) SC_MAJOR_LABEL['fam:'+fam]='All '+grp; items.forEach(([lbl,code])=>SC_MAJOR_LABEL['cip:'+code]=lbl); });
 // Athletics (EADA) — division + sport sponsorship by IPEDS unitid (= Scorecard id)
 const SC_SPORTS=['Basketball','Football','Baseball','Softball','Soccer','Volleyball','Golf','Tennis','Cross Country / Track','Swimming & Diving','Wrestling','Lacrosse','Field Hockey'];
-const SC_DIV_LABEL={DI:'NCAA D-I',DII:'NCAA D-II',DIII:'NCAA D-III',NAIA:'NAIA'};
+const SC_DIV_LABEL={
+  'DI-FBS':'NCAA D-I FBS','DI-FCS':'NCAA D-I FCS','DI-NoFB':'NCAA D-I (no football)',
+  DII:'NCAA D-II',DIII:'NCAA D-III',NAIA:'NAIA',
+  DI:'NCAA D-I'  // legacy fallback
+};
+const SC_DIV_GROUPS={DI:['DI-FBS','DI-FCS','DI-NoFB']};  // selecting "DI" matches all three subdivisions
 // Top-6 most-sponsored sports per gender for the filter (editable)
 const SPORT_FILTER={m:['Football','Basketball','Baseball','Soccer','Cross Country / Track','Golf'],
                     w:['Basketball','Volleyball','Softball','Soccer','Cross Country / Track','Golf']};
@@ -909,7 +925,16 @@ function initCollege(){
     mj.innerHTML=h;
   }
   const dv=document.getElementById('cDivision');
-  if(dv && !dv.options.length) dv.innerHTML='<option value="">Any division</option>'+['DI','DII','DIII','NAIA'].map(d=>`<option value="${d}">${SC_DIV_LABEL[d]}</option>`).join('');
+  if(dv && !dv.options.length){
+    dv.innerHTML='<option value="">Any division</option>'
+      +'<optgroup label="NCAA Division I">'
+      +  '<option value="DI">All NCAA D-I</option>'
+      +  '<option value="DI-FBS">D-I FBS (highest-tier football)</option>'
+      +  '<option value="DI-FCS">D-I FCS (championship subdivision football)</option>'
+      +  '<option value="DI-NoFB">D-I (no football program)</option>'
+      +'</optgroup>'
+      +['DII','DIII','NAIA'].map(d=>`<option value="${d}">${SC_DIV_LABEL[d]}</option>`).join('');
+  }
   const sp=document.getElementById('cSport');
   if(sp && !sp.options.length){
     let h='<option value="">Any sport</option><optgroup label="Men\'s">'+SPORT_FILTER.m.map(s=>`<option value="m:${s}">Men's ${s}</option>`).join('')+'</optgroup>';
@@ -942,7 +967,7 @@ async function searchColleges(){
   const keep=(r)=>{
     if((+r['school.degrees_awarded.highest']||0)<3) return false;
     if(famKey && !((+r['latest.academics.program_percentage.'+famKey]||0)>0)) return false;
-    if(wantDiv){ const a=athOf(r['id']); if(!a||a[0]!==wantDiv) return false; }
+    if(wantDiv){ const a=athOf(r['id']); if(!a) return false; const ok = SC_DIV_GROUPS[wantDiv] ? SC_DIV_GROUPS[wantDiv].includes(a[0]) : a[0]===wantDiv; if(!ok) return false; }
     if(wantSport){ const a=athOf(r['id']); if(!a) return false; const mask=sportG==='m'?a[1]:a[2]; if(!(mask&(1<<sportBit))) return false; }
     return true;
   };
