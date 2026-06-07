@@ -9,7 +9,15 @@
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#1f4e78">
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+</script>
 <script>(function(){try{var t=localStorage.getItem('theme')||((window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 <style>
   :root{
@@ -516,8 +524,31 @@ Freshman S1,Band,Elective / Non-Core,95,1,Regular,No</pre>
 </div>
 <footer>
   <img src="favicon-32.png" alt="">
-  <span>© <span id="yr"></span> Warren Anderson Consulting LLC · For planning only — verify eligibility with your school and the NCAA Eligibility Center. <span style="opacity:.6">v2.1</span></span>
+  <span>© <span id="yr"></span> Warren Anderson Consulting LLC · For planning only — verify eligibility with your school and the NCAA Eligibility Center. <span style="opacity:.6">v2.1</span> · <a href="gpatelca-offline.zip" download style="color:inherit">📥 Download offline version</a> · <button class="ghost noprint" style="padding:2px 8px;font-size:.78rem" id="installBtn" onclick="triggerInstall()" hidden>📲 Install app</button></span>
 </footer>
+
+<script>
+// PWA install prompt — show an "Install app" button only if the browser supports it AND the user hasn't installed yet
+let _pwaInstallEvent = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  _pwaInstallEvent = e;
+  const btn = document.getElementById('installBtn');
+  if (btn) btn.hidden = false;
+});
+window.addEventListener('appinstalled', () => {
+  const btn = document.getElementById('installBtn');
+  if (btn) btn.hidden = true;
+});
+function triggerInstall(){
+  if (!_pwaInstallEvent) {
+    alert('To install: in Chrome/Edge click the ⊕ icon in the address bar; on iPhone use Share → "Add to Home Screen".');
+    return;
+  }
+  _pwaInstallEvent.prompt();
+  _pwaInstallEvent.userChoice.then(() => { _pwaInstallEvent = null; });
+}
+</script>
 
 <script>
 document.getElementById('yr').textContent = new Date().getFullYear();

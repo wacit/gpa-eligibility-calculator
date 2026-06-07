@@ -1,0 +1,19 @@
+{
+  "name": "GPA & Athletic Eligibility Calculator",
+  "short_name": "GPA Calc",
+  "description": "Convert grades between 7-point and 10-point scales; check NCAA DI/DII core GPA and NAIA eligibility; explore colleges by major, division, and sport.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0f141a",
+  "theme_color": "#1f4e78",
+  "icons": [
+    { "src": "favicon-16.png",       "sizes": "16x16",   "type": "image/png" },
+    { "src": "favicon-32.png",       "sizes": "32x32",   "type": "image/png" },
+    { "src": "favicon-48.png",       "sizes": "48x48",   "type": "image/png" },
+    { "src": "apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "icon-512.png",         "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "categories": ["education", "utilities"]
+}
