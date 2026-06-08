@@ -361,6 +361,7 @@ Freshman S1,Band,Elective / Non-Core,95,1,Regular,No</pre>
       <button class="sec" onclick="openPaste()">📋 Paste / AI import</button>
       <button class="ghost" onclick="openImport()">📥 Where's my data?</button>
       <button class="ghost" onclick="downloadTemplate()">Download CSV template</button>
+      <button class="ghost" onclick="downloadFullExample()" title="Download a complete 4-year sample CSV showing every column pattern, AP/Honors tracks, electives, a failed course, and planned senior-year rows">📚 Download full example</button>
       <button class="ghost" onclick="loadSample()">Load sample data</button>
       <button class="ghost" onclick="clearAll()">Clear all</button>
     </div>
@@ -1172,6 +1173,18 @@ function downloadTemplate(){
     'Freshman S1,Band,Elective / Non-Core,95,1,Regular,No',
     'Senior S1,English 12,English,85,1,Honors,Yes'];
   dl('gpa_template.csv', rows.join('\n'));
+}
+async function downloadFullExample(){
+  // Fetch the full example CSV that lives alongside the app (works online and offline thanks to the PWA cache)
+  try {
+    const res = await fetch('gpa_example_full.csv');
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const text = await res.text();
+    dl('gpa_example_full.csv', text);
+    profMsg('Downloaded gpa_example_full.csv — 48 rows across 4 years; import it with "Import CSV…" to see how a complete profile looks.');
+  } catch (e) {
+    alert('Could not fetch example: '+e.message);
+  }
 }
 function exportCourses(){
   const rows=[HEADERS.join(',')];

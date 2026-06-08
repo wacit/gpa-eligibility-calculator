@@ -16,7 +16,8 @@ $appFiles = @(
   'index.html', 'athletics.json',
   'favicon.ico','favicon-16.png','favicon-32.png','favicon-48.png',
   'apple-touch-icon.png','icon-512.png',
-  'gpa_template.csv'
+  'gpa_template.csv', 'gpa_example_full.csv',
+  'manifest.webmanifest','sw.js'
 )
 foreach ($f in $appFiles) {
   $src = Join-Path $root $f

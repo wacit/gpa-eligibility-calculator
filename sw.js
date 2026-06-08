@@ -1,6 +1,6 @@
 // GPA & Athletic Eligibility Calculator — Service Worker
 // Bump CACHE_VERSION whenever shipping a new app build so users get the update.
-const CACHE_VERSION = 'gpa-v2026-06-07-2';
+const CACHE_VERSION = 'gpa-v2026-06-07-3';
 const CORE = [
   './',
   './index.html',
@@ -12,7 +12,8 @@ const CORE = [
   './favicon-48.png',
   './apple-touch-icon.png',
   './icon-512.png',
-  './gpa_template.csv'
+  './gpa_template.csv',
+  './gpa_example_full.csv'
 ];
 
 self.addEventListener('install', (e) => {

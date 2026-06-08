@@ -1,0 +1,49 @@
+Term,Course,Category,Percent,CreditHours,Track,Planned
+Freshman S1,English 9,English,88,1.0,Regular,No
+Freshman S1,Algebra I,Math,82,1.0,Regular,No
+Freshman S1,Earth Science,Science,85,1.0,Regular,No
+Freshman S1,World History,Social Science,90,1.0,Regular,No
+Freshman S1,Spanish I,Foreign Language,86,1.0,Regular,No
+Freshman S1,Health,Elective / Non-Core,92,0.5,Regular,No
+Freshman S1,PE,Elective / Non-Core,95,0.5,Regular,No
+Freshman S1,Band,Elective / Non-Core,94,1.0,Regular,No
+Freshman S2,English 9,English,84,1.0,Regular,No
+Freshman S2,Algebra I,Math,80,1.0,Regular,No
+Freshman S2,Earth Science,Science,83,1.0,Regular,No
+Freshman S2,World History,Social Science,88,1.0,Regular,No
+Freshman S2,Spanish I,Foreign Language,84,1.0,Regular,No
+Freshman S2,Band,Elective / Non-Core,96,1.0,Regular,No
+Sophomore S1,Honors English 10,English,86,1.0,Honors,No
+Sophomore S1,Geometry,Math,81,1.0,Regular,No
+Sophomore S1,Biology,Science,79,1.0,Regular,No
+Sophomore S1,US History,Social Science,84,1.0,Honors,No
+Sophomore S1,Spanish II,Foreign Language,82,1.0,Regular,No
+Sophomore S1,Band,Elective / Non-Core,92,1.0,Regular,No
+Sophomore S2,Honors English 10,English,85,1.0,Honors,No
+Sophomore S2,Geometry,Math,83,1.0,Regular,No
+Sophomore S2,Biology,Science,68,0.0,Regular,No
+Sophomore S2,US History,Social Science,87,1.0,Honors,No
+Sophomore S2,Spanish II,Foreign Language,80,1.0,Regular,No
+Sophomore S2,Band,Elective / Non-Core,94,1.0,Regular,No
+Junior S1,English 11,English,89,1.0,Regular,No
+Junior S1,Algebra II,Math,84,1.0,Regular,No
+Junior S1,Chemistry,Science,82,1.0,Regular,No
+Junior S1,AP US History,Social Science,87,1.0,AP,No
+Junior S1,Spanish III,Foreign Language,86,1.0,Regular,No
+Junior S1,Band,Elective / Non-Core,93,1.0,Regular,No
+Junior S2,English 11,English,91,1.0,Regular,No
+Junior S2,Algebra II,Math,86,1.0,Regular,No
+Junior S2,Chemistry,Science,84,1.0,Regular,No
+Junior S2,AP US History,Social Science,89,1.0,AP,No
+Junior S2,Spanish III,Foreign Language,88,1.0,Regular,No
+Junior S2,Personal Finance,Elective / Non-Core,90,0.5,Regular,No
+Senior S1,AP English Literature,English,85,1.0,AP,Yes
+Senior S1,Pre-Calculus,Math,82,1.0,Honors,Yes
+Senior S1,AP Biology,Science,80,1.0,AP,Yes
+Senior S1,Economics,Social Science,87,1.0,Regular,Yes
+Senior S1,Yearbook,Elective / Non-Core,95,1.0,Regular,Yes
+Senior S2,AP English Literature,English,86,1.0,AP,Yes
+Senior S2,Pre-Calculus,Math,84,1.0,Honors,Yes
+Senior S2,AP Biology,Science,82,1.0,AP,Yes
+Senior S2,Government,Social Science,89,1.0,Regular,Yes
+Senior S2,Yearbook,Elective / Non-Core,96,1.0,Regular,Yes
