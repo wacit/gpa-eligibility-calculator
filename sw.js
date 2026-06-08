@@ -1,6 +1,6 @@
 // GPA & Athletic Eligibility Calculator — Service Worker
 // Bump CACHE_VERSION whenever shipping a new app build so users get the update.
-const CACHE_VERSION = 'gpa-v2026-06-07-1';
+const CACHE_VERSION = 'gpa-v2026-06-07-2';
 const CORE = [
   './',
   './index.html',

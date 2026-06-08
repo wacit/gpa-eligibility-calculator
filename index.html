@@ -193,7 +193,7 @@ if('serviceWorker' in navigator){
     <p>Add upcoming courses with the <b>Plan?</b> box checked (or use <span class="tag">+ Add planned (senior) course</span>). Then use the <b>View</b> toggle above the results to switch between <b>Completed only</b> and <b>Projected (incl. planned)</b> to see where the GPA is headed at graduation.</p>
 
     <h3>6 · Explore colleges (optional)</h3>
-    <p>In the <b>College search &amp; match</b> card, search by school name, state, and/or major, and narrow by <b>NCAA/NAIA division</b> (D-I / D-II / D-III / NAIA) and by a <b>men's or women's sport</b> the school sponsors (e.g. only NAIA schools in Ohio with men's soccer). Each result is labeled with its <b>division</b> and shows <b>cost</b> (net price &amp; tuition), <b>admission rate</b>, and the school's <b>SAT/ACT middle-50%</b> ranges, with a link to the school. <b>Star (☆)</b> schools to add them to <b>Compare</b> — a side-by-side table of cost, admission rate, division, and your match. Use the <b>Show 25 / 50 / 100</b> selector to see more results. <b>Note:</b> filters combine — a school must match <i>all</i> of them, so to find one specific school type its <b>name</b> and leave the others on "Any"; pick a <b>state</b> first when browsing by division/sport. If you've entered ACT/SAT above, you'll also get an <b>academic match</b> badge — <span class="tag likely">Likely</span> <span class="tag target">Target</span> <span class="tag reach">Reach</span> — based on how your scores compare to that school's ranges and selectivity. It's an <i>estimate</i>, not a guarantee (recruited athletes may get extra admissions support). Data is the federal College Scorecard; only your search terms are sent — your scores stay in your browser.</p>
+    <p>In the <b>College search &amp; match</b> card, search by school name, state, and/or <b>one or more majors</b> (the major picker is multi-select — check every major you'd consider). You can also narrow by <b>NCAA/NAIA division</b> (D-I FBS / D-I FCS / D-I no-football / D-II / D-III / NAIA) and a <b>men's or women's sport</b>. There's a <b>Pre-Professional / Transfer</b> group with <b>Pre-Engineering (incl. 3+2)</b>, <b>Pre-Health</b>, <b>Pre-Law</b>, and <b>Liberal Arts</b> for schools that offer two-year preparatory tracks before transferring or applying to professional school. Each result is labeled with its <b>division</b>, shows <b>cost</b> (net price &amp; tuition), <b>admission rate</b>, <b>SAT/ACT middle-50%</b>, and a green ✓ for each of your selected majors the school offers. <b>Star (☆)</b> schools to add them to <b>Compare</b>. Use <b>Show 25 / 50 / 100</b> to see more results. <b>Note:</b> majors are OR (any one is enough), but division/sport/state filters are AND. If you've entered ACT/SAT above, you'll also get an <b>academic match</b> badge — <span class="tag likely">Likely</span> <span class="tag target">Target</span> <span class="tag reach">Reach</span> — comparing your scores to the school's ranges and selectivity. It's an <i>estimate</i>, not a guarantee (recruited athletes may get extra admissions support). Data is the federal College Scorecard; only your search terms are sent — your scores stay in your browser.</p>
 
     <h3>7 · Save or share</h3>
     <ul>
@@ -487,7 +487,16 @@ Freshman S1,Band,Elective / Non-Core,95,1,Regular,No</pre>
     <div class="row noprint" style="gap:10px">
       <input id="cSchool" placeholder="School name (e.g. Ohio State)" style="flex:1;min-width:160px" onkeydown="if(event.key==='Enter')searchColleges()" aria-label="School name to search">
       <select id="cState" style="width:120px" aria-label="Filter by state"></select>
-      <select id="cMajor" style="width:190px" aria-label="Filter by major"></select>
+      <div id="cMajorWrap" style="position:relative;width:220px">
+        <button type="button" id="cMajorBtn" onclick="toggleMajorPicker(event)" aria-haspopup="listbox" aria-expanded="false" class="sec" style="width:100%;text-align:left;padding:6px 10px;border-color:var(--line);color:var(--ink);background:var(--input-bg);font-weight:normal;display:flex;justify-content:space-between;align-items:center;gap:6px">
+          <span id="cMajorBtnLabel" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Any major</span>
+          <span style="opacity:.6">▾</span>
+        </button>
+        <div id="cMajorPanel" role="listbox" aria-multiselectable="true" style="display:none;position:absolute;top:calc(100% + 4px);left:0;z-index:50;width:360px;max-height:380px;overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:8px;box-shadow:0 6px 24px rgba(0,0,0,.18);padding:8px 10px;font-size:.85rem">
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px"><b style="color:var(--navy)">Majors</b> <span class="small" style="color:var(--muted);margin-left:auto">pick one or more</span> <button type="button" class="ghost" style="padding:2px 8px;font-size:.78rem" onclick="clearMajors(event)">Clear</button></div>
+          <div id="cMajorOptions"></div>
+        </div>
+      </div>
       <select id="cDivision" style="width:150px" aria-label="Filter by NCAA/NAIA division"></select>
       <select id="cSport" style="width:175px" aria-label="Filter by sport"></select>
       <select id="cResultCount" style="width:120px" onchange="searchColleges()" aria-label="Number of results to show"></select>
@@ -919,6 +928,12 @@ const SC_MAJOR_GROUPS=[
  ['Humanities & Languages',null,[['English Lang & Lit','2301'],['History','5401'],['Philosophy','3801'],['Foreign Languages','1601']]],
  ['Agriculture','agriculture',[['Agriculture (general)','0100'],['Animal Science','0109'],['Agribusiness','0101']]],
  ['Architecture','architecture',[['Architecture','0402']]],
+ ['Pre-Professional / Transfer',null,[
+   ['Pre-Engineering (incl. 3+2)','1401'],
+   ['Pre-Health / Pre-Med / Pre-Dent / Pre-Vet / Pre-Pharm','5111'],
+   ['Pre-Law / Legal Studies','2200'],
+   ['Liberal Arts (general transfer)','2401']
+ ]],
 ];
 const SC_MAJOR_LABEL={};
 SC_MAJOR_GROUPS.forEach(([grp,fam,items])=>{ if(fam) SC_MAJOR_LABEL['fam:'+fam]='All '+grp; items.forEach(([lbl,code])=>SC_MAJOR_LABEL['cip:'+code]=lbl); });
@@ -942,19 +957,25 @@ function loadFavs(){ try{ favs=JSON.parse(localStorage.getItem('collegeFavs')||'
 function saveFavs(){ try{ localStorage.setItem('collegeFavs', JSON.stringify(favs)); }catch(e){} }
 function toggleFav(id){ if(favs[id]) delete favs[id]; else if(_scById[id]) favs[id]=_scById[id]; saveFavs(); refreshCollegeMatch(); updateCompareBtn(); }
 function updateCompareBtn(){ const b=document.getElementById('cCompareBtn'); if(!b)return; const n=Object.keys(favs).length; b.textContent='⭐ Compare ('+n+')'; b.style.display=n?'inline-block':'none'; }
+let _selectedMajors=[];   // array of values like "fam:engineering" or "cip:1419"
 function initCollege(){
-  const st=document.getElementById('cState'), mj=document.getElementById('cMajor');
+  const st=document.getElementById('cState');
   if(st && !st.options.length) st.innerHTML='<option value="">Any state</option>'+SC_STATES.map(s=>`<option>${s}</option>`).join('');
-  if(mj && !mj.options.length){
-    let h='<option value="">Any major</option>';
+  // Multi-select major panel
+  const mp=document.getElementById('cMajorOptions');
+  if(mp && !mp.children.length){
+    let h='';
     for(const [grp,fam,items] of SC_MAJOR_GROUPS){
-      h+=`<optgroup label="${grp}">`;
-      if(fam) h+=`<option value="fam:${fam}">All ${grp}</option>`;
-      for(const [lbl,code] of items) h+=`<option value="cip:${code}">${lbl}</option>`;
-      h+='</optgroup>';
+      h+=`<div style="margin:6px 0 2px"><b style="color:var(--navy);font-size:.8rem">${grp}</b></div>`;
+      if(fam) h+=`<label style="display:block;padding:2px 0;cursor:pointer"><input type="checkbox" value="fam:${fam}" onchange="onMajorToggle(event)"> All ${grp}</label>`;
+      for(const [lbl,code] of items) h+=`<label style="display:block;padding:2px 0;cursor:pointer;margin-left:14px"><input type="checkbox" value="cip:${code}" onchange="onMajorToggle(event)"> ${lbl}</label>`;
     }
-    mj.innerHTML=h;
+    mp.innerHTML=h;
   }
+  document.addEventListener('click',(e)=>{
+    const w=document.getElementById('cMajorWrap');
+    if(w && !w.contains(e.target)) closeMajorPicker();
+  });
   const dv=document.getElementById('cDivision');
   if(dv && !dv.options.length){
     dv.innerHTML='<option value="">Any division</option>'
@@ -976,10 +997,31 @@ function initCollege(){
   if(rc && !rc.options.length) rc.innerHTML=[25,50,100,250].map(n=>`<option value="${n}"${n===50?' selected':''}>Show ${n===250?'all':n}</option>`).join('');
 }
 function majorLabel(key){ return SC_MAJOR_LABEL[key]||'Major'; }
+function toggleMajorPicker(e){ e&&e.stopPropagation(); const p=document.getElementById('cMajorPanel'); const open=p.style.display==='block'; p.style.display=open?'none':'block'; document.getElementById('cMajorBtn').setAttribute('aria-expanded',!open); }
+function closeMajorPicker(){ const p=document.getElementById('cMajorPanel'); if(p){p.style.display='none'; document.getElementById('cMajorBtn').setAttribute('aria-expanded','false');} }
+function onMajorToggle(e){
+  const v=e.target.value;
+  if(e.target.checked){ if(!_selectedMajors.includes(v)) _selectedMajors.push(v); }
+  else _selectedMajors=_selectedMajors.filter(x=>x!==v);
+  updateMajorBtnLabel();
+}
+function clearMajors(e){
+  e&&e.stopPropagation();
+  _selectedMajors=[];
+  document.querySelectorAll('#cMajorOptions input[type=checkbox]').forEach(cb=>cb.checked=false);
+  updateMajorBtnLabel();
+}
+function updateMajorBtnLabel(){
+  const el=document.getElementById('cMajorBtnLabel'); if(!el) return;
+  if(!_selectedMajors.length){ el.textContent='Any major'; return; }
+  if(_selectedMajors.length===1) el.textContent=majorLabel(_selectedMajors[0]);
+  else el.textContent=`${_selectedMajors.length} majors selected`;
+}
 async function searchColleges(){
-  const name=val('cSchool').trim(), state=val('cState'), major=val('cMajor');
+  const name=val('cSchool').trim(), state=val('cState');
+  const majors=_selectedMajors.slice();
   const box=document.getElementById('cResults');
-  if(!name && !state && !major){ box.innerHTML='<p class="note">Enter a school name, pick a state, or choose a major to search.</p>'; return; }
+  if(!name && !state && !majors.length){ box.innerHTML='<p class="note">Enter a school name, pick a state, or choose one or more majors to search.</p>'; return; }
   box.innerHTML='<p class="note">Searching…</p>';
   const fields=['id','school.name','school.city','school.state','school.school_url','latest.student.size',
     'school.degrees_awarded.predominant','school.degrees_awarded.highest',
@@ -988,16 +1030,24 @@ async function searchColleges(){
     'latest.admissions.sat_scores.75th_percentile.critical_reading','latest.admissions.sat_scores.75th_percentile.math',
     'latest.admissions.act_scores.25th_percentile.cumulative','latest.admissions.act_scores.75th_percentile.cumulative',
     'latest.cost.avg_net_price.public','latest.cost.avg_net_price.private','latest.cost.tuition.in_state','latest.cost.tuition.out_of_state'];
-  const famKey = major.startsWith('fam:')?major.slice(4):null;
-  const cip = major.startsWith('cip:')?major.slice(4):null;
-  if(famKey) fields.push('latest.academics.program_percentage.'+famKey);
+  // Parse selected majors into family keys (program_percentage filter) and specific CIP codes
+  const famKeys = majors.filter(m=>m.startsWith('fam:')).map(m=>m.slice(4));
+  const cipCodes = majors.filter(m=>m.startsWith('cip:')).map(m=>m.slice(4));
+  famKeys.forEach(k=>fields.push('latest.academics.program_percentage.'+k));
+  if(cipCodes.length) fields.push('latest.programs.cip_4_digit.code');
   const want=+val('cResultCount')||25;
   const wantDiv=val('cDivision'), wantSport=val('cSport');
   const sportBit = wantSport? SC_SPORTS.indexOf(wantSport.split(':')[1]) : -1;
   const sportG = wantSport? wantSport.split(':')[0] : null;
   const keep=(r)=>{
     if((+r['school.degrees_awarded.highest']||0)<3) return false;
-    if(famKey && !((+r['latest.academics.program_percentage.'+famKey]||0)>0)) return false;
+    // OR-logic for majors: school must offer at least ONE of the selected majors
+    if(majors.length){
+      const offered = cipCodes.length ? (r['latest.programs.cip_4_digit']||[]).map(p=>String(p.code)) : [];
+      const hasCip = cipCodes.some(c=>offered.includes(c));
+      const hasFam = famKeys.some(k=>(+r['latest.academics.program_percentage.'+k]||0)>0);
+      if(!(hasCip||hasFam)) return false;
+    }
     if(wantDiv){ const a=athOf(r['id']); if(!a) return false; const ok = SC_DIV_GROUPS[wantDiv] ? SC_DIV_GROUPS[wantDiv].includes(a[0]) : a[0]===wantDiv; if(!ok) return false; }
     if(wantSport){ const a=athOf(r['id']); if(!a) return false; const mask=sportG==='m'?a[1]:a[2]; if(!(mask&(1<<sportBit))) return false; }
     return true;
@@ -1006,7 +1056,7 @@ async function searchColleges(){
   base.set('api_key',SCORECARD_KEY);
   if(name) base.set('school.name',name);
   if(state) base.set('school.state',state);
-  if(cip) base.set('latest.programs.cip_4_digit.code',cip);
+  if(cipCodes.length) base.set('latest.programs.cip_4_digit.code',cipCodes.join(','));   // OR via comma
   base.set('school.operating','1'); base.set('school.degrees_awarded.predominant__range','3..4');
   base.set('fields',fields.join(',')); base.set('sort','latest.student.size:desc'); base.set('per_page','100');
   try{
@@ -1024,7 +1074,7 @@ async function searchColleges(){
     }
     kept.sort((a,b)=>(+b['latest.student.size']||0)-(+a['latest.student.size']||0));
     const more = (page*100<total); // more API records exist beyond what we scanned
-    renderColleges(kept.slice(0,want), major, {shown:Math.min(kept.length,want), found:kept.length, more});
+    renderColleges(kept.slice(0,want), majors, {shown:Math.min(kept.length,want), found:kept.length, more});
   }catch(e){ box.innerHTML='<p class="note" style="color:var(--red)">Search failed: '+esc(e.message)+'. Check your connection or try again.</p>'; }
 }
 function scPct(x){ return x!=null?Math.round(x*100)+'%':'—'; }
@@ -1049,21 +1099,24 @@ function matchLabel(r){
   }
   return [label,'', label==='Likely'?'likely':label==='Target'?'target':'reach'];
 }
-function renderColleges(rows, major, info){
-  _scRows=rows; _scMajor=major; _scInfo=info;
+function renderColleges(rows, majors, info){
+  _scRows=rows; _scMajor=majors; _scInfo=info;
   const box=document.getElementById('cResults');
-  if(!rows.length){ box.innerHTML='<p class="note">No matching schools found. Try a different name'+(major?' or major':'')+', or relax a filter.</p>'; return; }
+  if(!rows.length){ box.innerHTML='<p class="note">No matching schools found. Try a different name'+(majors&&majors.length?' or fewer majors':'')+', or relax a filter.</p>'; return; }
   rows.forEach(r=>{ _scById[String(r['id'])]=r; });
   const hdr = info? `<p class="note" style="margin:2px 0 6px"><b>${rows.length}</b> school${rows.length>1?'s':''} shown${info.more?' — more available; increase <b>Results</b> or add a school name/state to narrow':''}.</p>` : '';
+  const famKeys = (majors||[]).filter(m=>m.startsWith('fam:')).map(m=>m.slice(4));
+  const cipCodes = (majors||[]).filter(m=>m.startsWith('cip:')).map(m=>m.slice(4));
   box.innerHTML = hdr + rows.map(r=>{
     const id=String(r['id']);
     const url=r['school.school_url']; const link=url?('https://'+(''+url).replace(/^https?:\/\//,'')):null;
     const sr=satRange(r), arr=actRange(r);
     const net=r['latest.cost.avg_net_price.public']!=null?r['latest.cost.avg_net_price.public']:r['latest.cost.avg_net_price.private'];
     const [ml,mtip,mcls]=matchLabel(r);
-    const famKey = major.startsWith('fam:')?major.slice(4):null;
-    const majShare = famKey? r['latest.academics.program_percentage.'+famKey]:null;
-    const offersCip = major.startsWith('cip:');
+    // Per-school major tags
+    const offered = (r['latest.programs.cip_4_digit']||[]).map(p=>String(p.code));
+    const cipMatches = cipCodes.filter(c=>offered.includes(c));
+    const famMatches = famKeys.filter(k=>(+r['latest.academics.program_percentage.'+k]||0)>0);
     const a=athOf(r['id']); const divLbl=a?SC_DIV_LABEL[a[0]]:null;
     const fav=!!favs[id];
     return `<div class="college">
@@ -1082,8 +1135,8 @@ function renderColleges(rows, major, info){
         <span><b>Avg net price:</b> ${scMoney(net)}/yr</span>
         <span><b>Tuition in/out:</b> ${scMoney(r['latest.cost.tuition.in_state'])} / ${scMoney(r['latest.cost.tuition.out_of_state'])}</span>
         ${r['latest.student.size']!=null?`<span><b>Undergrads:</b> ${(+r['latest.student.size']).toLocaleString()}</span>`:''}
-        ${majShare!=null?`<span><b>${esc(majorLabel(major))}:</b> ${(majShare*100).toFixed(1)}% of degrees</span>`:''}
-        ${offersCip?`<span style="color:var(--green)"><b>✓ Offers ${esc(majorLabel(major))}</b></span>`:''}
+        ${famMatches.map(k=>`<span><b>${esc(majorLabel('fam:'+k))}:</b> ${((+r['latest.academics.program_percentage.'+k])*100).toFixed(1)}% of degrees</span>`).join('')}
+        ${cipMatches.map(c=>`<span style="color:var(--green)"><b>✓ ${esc(majorLabel('cip:'+c))}</b></span>`).join('')}
       </div>
     </div>`;
   }).join('');
