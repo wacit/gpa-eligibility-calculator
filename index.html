@@ -954,7 +954,7 @@ const SC_DIV_GROUPS={DI:['DI-FBS','DI-FCS','DI-NoFB']};  // selecting "DI" match
 const SPORT_FILTER={m:['Football','Basketball','Baseball','Soccer','Ice Hockey','Lacrosse'],
                     w:['Basketball','Volleyball','Softball','Soccer','Lacrosse','Ice Hockey']};
 let ATH={schools:{},split_di:{}};
-function loadAthletics(){ fetch('athletics.json?v=2026-06-08').then(r=>r.json()).then(d=>{ATH=d; refreshCollegeMatch && refreshCollegeMatch();}).catch(()=>{}); }
+function loadAthletics(){ fetch('athletics.json?v=2026-06-08b').then(r=>r.json()).then(d=>{ATH=d; refreshCollegeMatch && refreshCollegeMatch();}).catch(()=>{}); }
 function athOf(id){ return ATH.schools? ATH.schools[String(id)] : null; }
 const SC_STATES=['AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY'];
 let _scRows=null,_scMajor='',_scInfo=null,_scById={},favs={};
@@ -1055,13 +1055,14 @@ async function searchColleges(){
     }
     if(wantDiv){
       const a=athOf(r['id']); if(!a) return false;
-      // Sport-aware division check: if a sport is selected and this school plays it at a different division
-      // (e.g., Johns Hopkins DIII overall but DI in lacrosse), use the sport-specific division.
-      const split = ATH.split_di && ATH.split_di[String(r['id'])];
       let effDiv = a[0];
-      if(wantSport && split){
-        const splitMask = sportG==='m' ? split.m : split.w;
-        if(splitMask & (1<<sportBit)) effDiv = 'DI-NoFB';   // school plays DI in this sport (track w/o-football tier as fallback)
+      // Sport-aware override: only when school's primary is DII/DIII and they play DI in this sport
+      if(wantSport && (effDiv==='DII' || effDiv==='DIII')){
+        const split = ATH.split_di && ATH.split_di[String(r['id'])];
+        if(split){
+          const splitMask = sportG==='m' ? split.m : split.w;
+          if(splitMask & (1<<sportBit)) effDiv = 'DI-NoFB';   // they play DI in this sport
+        }
       }
       const ok = SC_DIV_GROUPS[wantDiv] ? SC_DIV_GROUPS[wantDiv].includes(effDiv) : effDiv===wantDiv;
       if(!ok) return false;
@@ -1135,6 +1136,9 @@ function renderColleges(rows, majors, info){
     const cipMatches = cipCodes.filter(c=>offered.includes(c));
     const famMatches = famKeys.filter(k=>(+r['latest.academics.program_percentage.'+k]||0)>0);
     const a=athOf(r['id']); const divLbl=a?SC_DIV_LABEL[a[0]]:null;
+    // Reclassifying schools (e.g., New Haven DII -> DI-FCS year 1 of 4)
+    const recl = ATH.reclass && ATH.reclass[String(r['id'])];
+    const reclTip = recl ? `Mid-reclassification from ${SC_DIV_LABEL[recl.from]||recl.from} to ${SC_DIV_LABEL[recl.to]||recl.to}, year ${recl.year}` : '';
     // Detect split-classification (lower-div school playing DI in specific sports)
     const split = ATH.split_di && ATH.split_di[String(r['id'])];
     let splitSports = [];
@@ -1150,7 +1154,8 @@ function renderColleges(rows, majors, info){
       <div class="top">
         <div class="nm"><button class="star" onclick="toggleFav('${id}')" aria-label="${fav?'Remove from':'Add to'} compare list" aria-pressed="${fav}" title="${fav?'Remove from':'Add to'} compare">${fav?'★':'☆'}</button> ${link?`<a href="${link}" target="_blank" rel="noopener">${esc(r['school.name'])} ↗</a>`:esc(r['school.name'])}</div>
         <span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-          ${divLbl?`<span class="badge divb" title="Primary athletic classification (NCAA 2025-26)">${divLbl}</span>`:''}
+          ${divLbl?`<span class="badge divb" title="${recl?esc(reclTip):'Primary athletic classification (NCAA 2025-26)'}">${divLbl}${recl?' ⚙':''}</span>`:''}
+          ${recl?`<span class="badge divb" style="background:#b76e00;border-color:#b76e00" title="${esc(reclTip)}">Reclassifying (Yr ${recl.year})</span>`:''}
           ${splitSports.length?`<span class="badge divb" style="background:#7d3f8a;border-color:#7d3f8a" title="Plays DI in: ${esc(splitTip)}">+ DI in ${splitSports.length} sport${splitSports.length>1?'s':''}</span>`:''}
           <span class="badge ${mcls}"${mtip?` title="${esc(mtip)}"`:''}>${ml?('Match: '+ml):mtip}</span>
         </span>
