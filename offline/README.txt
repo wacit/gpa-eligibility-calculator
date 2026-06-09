@@ -50,7 +50,7 @@ with a fresh copy from the repo).
 
 SUPPORT
 -------
-Built by Warren Anderson Consulting LLC. Source code:
+Source code:
 https://github.com/wacit/gpa-eligibility-calculator
 
 This tool is for planning only — official eligibility is determined by

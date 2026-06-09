@@ -141,11 +141,10 @@ if('serviceWorker' in navigator){
 <body>
 <header>
   <div class="hbar">
-    <img class="mark" src="icon-512.png" alt="Warren Anderson Consulting LLC logo">
+    <img class="mark" src="icon-512.png" alt="GPA Calculator logo">
     <div class="htext">
       <h1>GPA &amp; Athletic Eligibility Calculator</h1>
       <p>Converts grades on a <b>7-point</b> and <b>10-point</b> scale · computes <b>NCAA</b> core GPA (DI/DII) and <b>NAIA</b> GPA · 100% in your browser — no data leaves this device.</p>
-      <span class="brandtag">Warren Anderson Consulting LLC</span>
     </div>
     <div style="display:flex;flex-direction:column;gap:6px;align-self:flex-start">
       <button class="helpbtn" onclick="openHelp()">❓ How to use</button>
@@ -547,7 +546,7 @@ Freshman S1,Band,Elective / Non-Core,95,1,Regular,No</pre>
 </div>
 <footer>
   <img src="favicon-32.png" alt="">
-  <span>© <span id="yr"></span> Warren Anderson Consulting LLC · For planning only — verify eligibility with your school and the NCAA Eligibility Center. <span style="opacity:.6">v2.1</span> · <a href="gpatelca-offline.zip" download style="color:inherit">📥 Download offline version</a> · <button class="ghost noprint" style="padding:2px 8px;font-size:.78rem" id="installBtn" onclick="triggerInstall()" hidden>📲 Install app</button></span>
+  <span>© <span id="yr"></span> · For planning only — verify eligibility with your school and the NCAA Eligibility Center. <span style="opacity:.6">v2.1</span> · <a href="gpatelca-offline.zip" download style="color:inherit">📥 Download offline version</a> · <button class="ghost noprint" style="padding:2px 8px;font-size:.78rem" id="installBtn" onclick="triggerInstall()" hidden>📲 Install app</button></span>
 </footer>
 
 <script>
@@ -967,7 +966,7 @@ const SC_DIV_GROUPS={DI:['DI-FBS','DI-FCS','DI-NoFB']};  // selecting "DI" match
 const SPORT_FILTER={m:['Football','Basketball','Baseball','Soccer','Ice Hockey','Lacrosse'],
                     w:['Basketball','Volleyball','Softball','Soccer','Lacrosse','Ice Hockey']};
 let ATH={schools:{},split_di:{}};
-function loadAthletics(){ fetch('athletics.json?v=2026-06-09d').then(r=>r.json()).then(d=>{ATH=d; refreshCollegeMatch && refreshCollegeMatch();}).catch(()=>{}); }
+function loadAthletics(){ fetch('athletics.json?v=2026-06-09e').then(r=>r.json()).then(d=>{ATH=d; refreshCollegeMatch && refreshCollegeMatch();}).catch(()=>{}); }
 function athOf(id){ return ATH.schools? ATH.schools[String(id)] : null; }
 const SC_STATES=['AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY'];
 let _scRows=null,_scMajor='',_scInfo=null,_scById={},favs={};
@@ -1181,12 +1180,20 @@ async function searchColleges(){
           const ml=m.toLowerCase();
           return wantLabels.some(w=>ml.includes(w)||w.includes(ml.split(' ')[0]));
         }));
-        if(matched && !wantDivSet.size){ extra.push(u); }
-        // If division filters are on, only include partnership schools that match one of them
-        else if(matched && wantDivSet.size){
-          const a=athOf(parseInt(u)); if(!a) continue;
-          if(wantDivSet.has(a[0])) extra.push(u);
+        if(!matched) continue;
+        const a = athOf(parseInt(u));
+        // Division filter — partnership school's primary division must match one of the chosen divisions
+        if(wantDivSet.size){
+          if(!a) continue;
+          if(!wantDivSet.has(a[0])) continue;
         }
+        // Sport filter — partnership school must actually sponsor the chosen sport (m/w mask check)
+        if(wantSport){
+          if(!a) continue;
+          const mask = sportG==='m'? a[1] : a[2];
+          if(!(mask & (1<<sportBit))) continue;
+        }
+        extra.push(u);
       }
       if(extra.length){
         const idURL = SC_BASE+'?api_key='+SCORECARD_KEY+'&id='+extra.join(',')+'&fields='+fields.join(',')+'&per_page='+Math.min(extra.length,100);
