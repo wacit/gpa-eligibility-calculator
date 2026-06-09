@@ -408,6 +408,7 @@ Freshman S1,Band,Elective / Non-Core,95,1,Regular,No</pre>
         <fieldset><legend>Weighting bonus</legend>
           <label>Honors + <input type="number" step="0.1" id="bH" value="0.5" aria-label="Honors GPA bonus"></label>
           <label>AP + <input type="number" step="0.1" id="bAP" value="1.0" aria-label="AP GPA bonus"></label>
+          <label title="When checked, the Honors/AP bonus only applies if the base letter grade is C or better (Elkhorn-style policy). When unchecked, any passing grade gets the bonus."><input type="checkbox" id="bonusCOnly" aria-label="Bonus only if C or better"> Bonus only if C+</label>
         </fieldset>
         <fieldset><legend>NCAA / NAIA</legend>
           <label>NCAA unit/course <input type="number" step="0.5" id="ncaaUnit" value="0.5" aria-label="NCAA credit units per semester course"></label>
@@ -644,7 +645,10 @@ function compute(){
     const p=+d.pct, hrs=+d.hrs||0, b=bonus(d.track);
     const L7=letter(p,s7), L10=letter(p,s10);
     const p7=GP[L7], p10=GP[L10];
-    const w7=p7>0?p7+b:0, w10=p10>0?p10+b:0;
+    const cOnly=document.getElementById('bonusCOnly')&&document.getElementById('bonusCOnly').checked;
+    // Elkhorn-style policy: bonus applies only when base grade is C (2.0) or better. Otherwise: bonus on any passing grade.
+    const w7 = p7>0 ? (cOnly && p7<2 ? p7 : p7+b) : 0;
+    const w10 = p10>0 ? (cOnly && p10<2 ? p10 : p10+b) : 0;
     oh+=hrs; o7u+=p7*hrs; o7w+=w7*hrs; o10u+=p10*hrs; o10w+=w10*hrs;
     if(isCore(d.cat)){
       if(L7!=="F"){ n7u+=unit; n7q+=p7*unit; }
@@ -729,16 +733,16 @@ function loadTests(){ try{ const s=JSON.parse(localStorage.getItem('naiaTests')|
 function val(id){ const e=document.getElementById(id); return e?e.value:''; }
 
 /* ---------- Save / load / share a full profile ---------- */
-const SETTING_IDS=['s7A','s7B','s7C','s7D','s10A','s10B','s10C','s10D','bH','bAP','ncaaUnit','diMin','diiMin','naiaMin'];
+const SETTING_IDS=['s7A','s7B','s7C','s7D','s10A','s10B','s10C','s10D','bH','bAP','bonusCOnly','ncaaUnit','diMin','diiMin','naiaMin'];
 function gatherProfile(){
-  const settings={}; SETTING_IDS.forEach(id=>{const e=document.getElementById(id); if(e)settings[id]=e.value;});
+  const settings={}; SETTING_IDS.forEach(id=>{const e=document.getElementById(id); if(e) settings[id] = (e.type==='checkbox')? (e.checked?'1':'0') : e.value;});
   return {v:1, data:data, tests:{act:val('act'),sat:val('sat'),rank:val('rank')}, settings};
 }
 function applyProfile(prof){
   if(!prof||typeof prof!=='object') throw new Error('invalid profile');
   data = Array.isArray(prof.data)? prof.data : [];
   const t=prof.tests||{}; ['act','sat','rank'].forEach(k=>{const e=document.getElementById(k); if(e)e.value=t[k]||'';});
-  if(prof.settings) Object.entries(prof.settings).forEach(([id,v])=>{const e=document.getElementById(id); if(e)e.value=v;});
+  if(prof.settings) Object.entries(prof.settings).forEach(([id,v])=>{const e=document.getElementById(id); if(e){ if(e.type==='checkbox') e.checked = (v==='1'||v===true); else e.value=v; }});
   saveTests(); render();
 }
 function profMsg(m){ const e=document.getElementById('profMsg'); if(e){ e.textContent=m; setTimeout(()=>{if(e.textContent===m)e.textContent='';},4000);} }
