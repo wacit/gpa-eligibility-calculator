@@ -117,6 +117,10 @@ if('serviceWorker' in navigator){
   .modal .tag{display:inline-block;background:var(--th-bg);color:var(--navy);border-radius:6px;padding:1px 7px;font-size:.82rem;font-weight:600;margin:1px}
   .modal .pass{background:var(--greenbg);color:var(--green)} .modal .fail{background:var(--redbg);color:var(--red)}
   .modal .tag.likely{background:var(--greenbg);color:var(--green)} .modal .tag.target{background:var(--amberbg);color:var(--amber)} .modal .tag.reach{background:var(--redbg);color:var(--red)}
+  /* Checkbox-row layout: keep checkbox vertically aligned with the first line of label text, even when label wraps */
+  .cbrow{display:flex;align-items:flex-start;gap:8px;padding:3px 0;cursor:pointer;line-height:1.35}
+  .cbrow input[type=checkbox]{flex:none;width:14px;height:14px;margin:3px 0 0 0;cursor:pointer}
+  .cbrow.indent{padding-left:22px}
   .college{border:1px solid var(--line);border-radius:9px;padding:10px 12px;margin:8px 0;background:var(--soft)}
   .college .top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
   .college .nm{font-weight:700;color:var(--navy)}
@@ -981,8 +985,8 @@ function initCollege(){
     let h='';
     for(const [grp,fam,items] of SC_MAJOR_GROUPS){
       h+=`<div style="margin:6px 0 2px"><b style="color:var(--navy);font-size:.8rem">${grp}</b></div>`;
-      if(fam) h+=`<label style="display:block;padding:2px 0;cursor:pointer"><input type="checkbox" value="fam:${fam}" onchange="onMajorToggle(event)"> All ${grp}</label>`;
-      for(const [lbl,code] of items) h+=`<label style="display:block;padding:2px 0;cursor:pointer;margin-left:14px"><input type="checkbox" value="cip:${code}" onchange="onMajorToggle(event)"> ${lbl}</label>`;
+      if(fam) h+=`<label class="cbrow"><input type="checkbox" value="fam:${fam}" onchange="onMajorToggle(event)"><span>All ${grp}</span></label>`;
+      for(const [lbl,code] of items) h+=`<label class="cbrow indent"><input type="checkbox" value="cip:${code}" onchange="onMajorToggle(event)"><span>${lbl}</span></label>`;
     }
     mp.innerHTML=h;
   }
@@ -1009,7 +1013,7 @@ function initCollege(){
     for(const [grp, items] of opts){
       h+=`<div style="margin:6px 0 2px"><b style="color:var(--navy);font-size:.8rem">${grp}</b></div>`;
       for(const [val,lbl] of items){
-        h+=`<label style="display:block;padding:2px 0;cursor:pointer"><input type="checkbox" value="${val}" onchange="onDivisionToggle(event)"> ${lbl}</label>`;
+        h+=`<label class="cbrow"><input type="checkbox" value="${val}" onchange="onDivisionToggle(event)"><span>${lbl}</span></label>`;
       }
     }
     dp.innerHTML = h;
