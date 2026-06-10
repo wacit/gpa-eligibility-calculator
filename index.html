@@ -196,7 +196,7 @@ if('serviceWorker' in navigator){
     <p>Add upcoming courses with the <b>Plan?</b> box checked (or use <span class="tag">+ Add planned (senior) course</span>). Then use the <b>View</b> toggle above the results to switch between <b>Completed only</b> and <b>Projected (incl. planned)</b> to see where the GPA is headed at graduation.</p>
 
     <h3>6 · Explore colleges (optional)</h3>
-    <p>In the <b>College search &amp; match</b> card, search by school name, state, and/or <b>one or more majors</b> (the major picker is multi-select — check every major you'd consider). You can also narrow by <b>NCAA/NAIA division</b> (D-I FBS / D-I FCS / D-I no-football / D-II / D-III / NAIA) and a <b>men's or women's sport</b>. There's a <b>Pre-Professional / Transfer</b> group with <b>Pre-Engineering (incl. 3+2)</b>, <b>Pre-Health</b>, <b>Pre-Law</b>, and <b>Liberal Arts</b> for schools that offer two-year preparatory tracks before transferring or applying to professional school. Each result is labeled with its <b>division</b>, shows <b>cost</b> (net price &amp; tuition), <b>admission rate</b>, <b>SAT/ACT middle-50%</b>, and a green ✓ for each of your selected majors the school offers. <b>Star (☆)</b> schools to add them to <b>Compare</b>. Use <b>Show 25 / 50 / 100</b> to see more results. <b>Note:</b> majors are OR (any one is enough), but division/sport/state filters are AND. If you've entered ACT/SAT above, you'll also get an <b>academic match</b> badge — <span class="tag likely">Likely</span> <span class="tag target">Target</span> <span class="tag reach">Reach</span> — comparing your scores to the school's ranges and selectivity. It's an <i>estimate</i>, not a guarantee (recruited athletes may get extra admissions support). Data is the federal College Scorecard; only your search terms are sent — your scores stay in your browser.</p>
+    <p>In the <b>College search &amp; match</b> card, search by school name, state, and/or <b>one or more majors</b> (the major picker is multi-select — check every major you'd consider). You can also narrow by <b>NCAA/NAIA division</b> (D-I FBS / D-I FCS / D-I no-football / D-II / D-III / NAIA) and a <b>men's or women's sport</b>. There's a <b>Pre-Professional / Transfer</b> group with <b>Pre-Engineering (incl. 3+2)</b>, <b>Pre-Health</b>, <b>Pre-Law</b>, and <b>Liberal Arts</b> for schools that offer two-year preparatory tracks before transferring or applying to professional school. Each result is labeled with its <b>division</b>, shows <b>cost</b> (net price &amp; tuition), <b>admission rate</b>, <b>SAT/ACT middle-50%</b>, and a green ✓ for each of your selected majors the school offers. <b>Star (☆)</b> schools to add them to <b>Compare</b>. Use <b>Show 25 / 50 / 100</b> for page size and the <b>⬇ Show more</b> button under the results to load the rest. When a sport filter is on, every card shows a <b>✓ Sponsors</b> confirmation for that sport. <b>Note:</b> majors are OR (any one is enough), but division/sport/state filters are AND. If you've entered ACT/SAT above, you'll also get an <b>academic match</b> badge — <span class="tag likely">Likely</span> <span class="tag target">Target</span> <span class="tag reach">Reach</span> — comparing your scores to the school's ranges and selectivity. It's an <i>estimate</i>, not a guarantee (recruited athletes may get extra admissions support). Data is the federal College Scorecard; only your search terms are sent — your scores stay in your browser.</p>
 
     <h3>7 · Save or share</h3>
     <ul>
@@ -967,8 +967,10 @@ const SC_DIV_LABEL={
 };
 const SC_DIV_GROUPS={DI:['DI-FBS','DI-FCS','DI-NoFB']};  // selecting "DI" matches all three subdivisions
 // Top-6 most-sponsored sports per gender for the filter (editable)
-const SPORT_FILTER={m:['Football','Basketball','Baseball','Soccer','Ice Hockey','Lacrosse'],
-                    w:['Basketball','Volleyball','Softball','Soccer','Lacrosse','Ice Hockey']};
+// All sports with verified sponsorship data (NCAA 2025-26 + EADA 2024-25).
+// Women's Wrestling omitted: not yet in the NCAA championship-sports spreadsheet, so coverage would be incomplete.
+const SPORT_FILTER={m:['Football','Basketball','Baseball','Soccer','Ice Hockey','Lacrosse','Wrestling','Volleyball','Golf','Tennis','Cross Country / Track','Swimming & Diving'],
+                    w:['Basketball','Volleyball','Softball','Soccer','Lacrosse','Ice Hockey','Field Hockey','Golf','Tennis','Cross Country / Track','Swimming & Diving']};
 let ATH={schools:{},split_di:{}};
 function loadAthletics(){ fetch('athletics.json?v=2026-06-09e').then(r=>r.json()).then(d=>{ATH=d; refreshCollegeMatch && refreshCollegeMatch();}).catch(()=>{}); }
 function athOf(id){ return ATH.schools? ATH.schools[String(id)] : null; }
@@ -1109,7 +1111,6 @@ async function searchColleges(){
   if(cipCodes.length) fields.push('latest.programs.cip_4_digit.code');
   const want=+val('cResultCount')||25;
   const wantDivSet=effectiveDivisionSet(), wantSport=val('cSport');
-  const wantDiv = _selectedDivisions.length? _selectedDivisions[0] : '';   // legacy variable (used in partnership pass to gate by single division)
   const sportBit = wantSport? SC_SPORTS.indexOf(wantSport.split(':')[1]) : -1;
   const sportG = wantSport? wantSport.split(':')[0] : null;
   const keep=(r)=>{
@@ -1205,15 +1206,47 @@ async function searchColleges(){
           const xr = await fetch(idURL);
           if(xr.ok){
             const xd = await xr.json();
-            for(const r of (xd.results||[])){ if(!have.has(String(r['id']))) kept.push(r); }
+            for(const r of (xd.results||[])){
+              if(have.has(String(r['id']))) continue;
+              if((+r['school.degrees_awarded.highest']||0)<3) continue;   // 4-year institutions only
+              kept.push(r);
+            }
           }
         }catch(_){}
       }
     }
     kept.sort((a,b)=>(+b['latest.student.size']||0)-(+a['latest.student.size']||0));
-    const more = (page*100<total); // more API records exist beyond what we scanned
-    renderColleges(kept.slice(0,want), majors, {shown:Math.min(kept.length,want), found:kept.length, more});
+    _searchCursor = {base, keep, kept, page, total, majors, want, sport:wantSport, shown:Math.min(want,kept.length)||want};
+    renderSearchPage();
   }catch(e){ box.innerHTML='<p class="note" style="color:var(--red)">Search failed: '+esc(e.message)+'. Check your connection or try again.</p>'; }
+}
+let _searchCursor=null;
+function renderSearchPage(){
+  const s=_searchCursor; if(!s) return;
+  const moreApi = s.page*100 < s.total;
+  const hasMore = s.kept.length > s.shown || moreApi;
+  renderColleges(s.kept.slice(0,s.shown), s.majors, {shown:Math.min(s.kept.length,s.shown), found:s.kept.length, more:moreApi, hasMore, sport:s.sport});
+}
+async function loadMoreColleges(){
+  const s=_searchCursor; if(!s) return;
+  const btn=document.getElementById('cMoreBtn');
+  if(btn){ btn.disabled=true; btn.textContent='Loading…'; }
+  s.shown += s.want;
+  // If the displayed window outruns what we've filtered so far, keep scanning the API
+  let guard=0;
+  while(s.kept.length < s.shown && s.page*100 < s.total && guard<4){
+    try{
+      s.base.set('page', s.page);
+      const res=await fetch(SC_BASE+'?'+s.base.toString());
+      if(!res.ok) break;
+      const d=await res.json();
+      s.total=(d.metadata&&d.metadata.total)||s.total;
+      s.kept=s.kept.concat((d.results||[]).filter(s.keep));
+      s.page++; guard++;
+    }catch(_){ break; }
+  }
+  s.kept.sort((a,b)=>(+b['latest.student.size']||0)-(+a['latest.student.size']||0));
+  renderSearchPage();
 }
 function scPct(x){ return x!=null?Math.round(x*100)+'%':'—'; }
 function scMoney(x){ return x!=null?'$'+(+x).toLocaleString():'—'; }
@@ -1242,9 +1275,11 @@ function renderColleges(rows, majors, info){
   const box=document.getElementById('cResults');
   if(!rows.length){ box.innerHTML='<p class="note">No matching schools found. Try a different name'+(majors&&majors.length?' or fewer majors':'')+', or relax a filter.</p>'; return; }
   rows.forEach(r=>{ _scById[String(r['id'])]=r; });
-  const hdr = info? `<p class="note" style="margin:2px 0 6px"><b>${rows.length}</b> school${rows.length>1?'s':''} shown${info.more?' — more available; increase <b>Results</b> or add a school name/state to narrow':''}.</p>` : '';
+  const hdr = info? `<p class="note" style="margin:2px 0 6px"><b>${rows.length}</b> school${rows.length>1?'s':''} shown${info.found>rows.length?` of <b>${info.found}</b> found`:''}${info.hasMore?' — click <b>Show more</b> below for the rest':''}.</p>` : '';
   const famKeys = (majors||[]).filter(m=>m.startsWith('fam:')).map(m=>m.slice(4));
   const cipCodes = (majors||[]).filter(m=>m.startsWith('cip:')).map(m=>m.slice(4));
+  // Sport-verification tag: when a sport filter is active, show explicit confirmation on every card
+  const sportInfo = info&&info.sport? (()=>{ const [g,nm]=info.sport.split(':'); return {g, nm, bit:SC_SPORTS.indexOf(nm), lbl:(g==='m'?"Men's ":"Women's ")+nm}; })() : null;
   box.innerHTML = hdr + rows.map(r=>{
     const id=String(r['id']);
     const url=r['school.school_url']; const link=url?('https://'+(''+url).replace(/^https?:\/\//,'')):null;
@@ -1297,9 +1332,14 @@ function renderColleges(rows, majors, info){
           const list=matched.slice(0,3).map(p=>`${p.name} (${p.commission})`).join(' • ');
           return `<span style="color:#0a6e2a;background:#e6f4ea;border:1px solid #0a6e2a;border-radius:6px;padding:1px 6px;font-size:.82rem" title="${esc(matched.map(p=>p.commission+' '+p.level+': '+p.name).join('\\n'))}">🏅 ABET-accredited: ${esc(list)}${matched.length>3?` (+${matched.length-3} more)`:''}</span>`;
         })()}
+        ${(()=>{ if(!sportInfo) return ''; const mask=a? (sportInfo.g==='m'?a[1]:a[2]) : 0;
+          return (mask & (1<<sportInfo.bit))
+            ? `<span style="color:var(--green)" title="Confirmed via NCAA 2025-26 sport sponsorship / EADA 2024-25"><b>✓ Sponsors ${esc(sportInfo.lbl)}</b></span>`
+            : `<span style="color:var(--red)" title="This school does not appear to sponsor this sport — please report if you believe this is wrong"><b>⚠ ${esc(sportInfo.lbl)} not found</b></span>`;
+        })()}
       </div>
     </div>`;
-  }).join('');
+  }).join('') + ((info&&info.hasMore)?`<p class="noprint" style="text-align:center;margin:12px 0 2px"><button class="sec" id="cMoreBtn" onclick="loadMoreColleges()">⬇ Show ${(_searchCursor&&_searchCursor.want)||25} more schools</button></p>`:'');
 }
 function refreshCollegeMatch(){ if(_scRows) renderColleges(_scRows,_scMajor,_scInfo); }
 function openCompare(){
