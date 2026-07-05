@@ -972,7 +972,7 @@ const SC_DIV_GROUPS={DI:['DI-FBS','DI-FCS','DI-NoFB']};  // selecting "DI" match
 const SPORT_FILTER={m:['Football','Basketball','Baseball','Soccer','Ice Hockey','Lacrosse','Wrestling','Volleyball','Golf','Tennis','Cross Country / Track','Swimming & Diving'],
                     w:['Basketball','Volleyball','Softball','Soccer','Lacrosse','Ice Hockey','Field Hockey','Golf','Tennis','Cross Country / Track','Swimming & Diving']};
 let ATH={schools:{},split_di:{}};
-function loadAthletics(){ fetch('athletics.json?v=2026-07-04a').then(r=>r.json()).then(d=>{ATH=d; refreshCollegeMatch && refreshCollegeMatch();}).catch(()=>{}); }
+function loadAthletics(){ fetch('athletics.json?v=2026-07-05a').then(r=>r.json()).then(d=>{ATH=d; refreshCollegeMatch && refreshCollegeMatch();}).catch(()=>{}); }
 function athOf(id){ return ATH.schools? ATH.schools[String(id)] : null; }
 const SC_STATES=['AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY'];
 let _scRows=null,_scMajor='',_scInfo=null,_scById={},favs={};
