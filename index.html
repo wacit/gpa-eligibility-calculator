@@ -196,7 +196,7 @@ if('serviceWorker' in navigator){
     <p>Add upcoming courses with the <b>Plan?</b> box checked (or use <span class="tag">+ Add planned (senior) course</span>). Then use the <b>View</b> toggle above the results to switch between <b>Completed only</b> and <b>Projected (incl. planned)</b> to see where the GPA is headed at graduation.</p>
 
     <h3>6 · Explore colleges (optional)</h3>
-    <p>In the <b>College search &amp; match</b> card, search by school name, state, and/or <b>one or more majors</b> (the major picker is multi-select — check every major you'd consider). You can also narrow by <b>NCAA/NAIA division</b> (D-I FBS / D-I FCS / D-I no-football / D-II / D-III / NAIA) and a <b>men's or women's sport</b>. There's a <b>Pre-Professional / Transfer</b> group with <b>Pre-Engineering (incl. 3+2)</b>, <b>Pre-Health</b>, <b>Pre-Law</b>, and <b>Liberal Arts</b> for schools that offer two-year preparatory tracks before transferring or applying to professional school. Each result is labeled with its <b>division</b>, shows <b>cost</b> (net price &amp; tuition), <b>admission rate</b>, <b>SAT/ACT middle-50%</b>, and a green ✓ for each of your selected majors the school offers. <b>Star (☆)</b> schools to add them to <b>Compare</b>. Use <b>Show 25 / 50 / 100</b> for page size and the <b>⬇ Show more</b> button under the results to load the rest. When a sport filter is on, every card shows a <b>✓ Sponsors</b> confirmation for that sport. <b>Note:</b> majors are OR (any one is enough), but division/sport/state filters are AND. If you've entered ACT/SAT above, you'll also get an <b>academic match</b> badge — <span class="tag likely">Likely</span> <span class="tag target">Target</span> <span class="tag reach">Reach</span> — comparing your scores to the school's ranges and selectivity. It's an <i>estimate</i>, not a guarantee (recruited athletes may get extra admissions support). Data is the federal College Scorecard; only your search terms are sent — your scores stay in your browser.</p>
+    <p>In the <b>College search &amp; match</b> card, search by school name, state, and/or <b>one or more majors</b> (the major picker is multi-select — check every major you'd consider). You can also narrow by <b>public or private</b> (private is split into non-profit and for-profit), <b>NCAA/NAIA division</b> (D-I FBS / D-I FCS / D-I no-football / D-II / D-III / NAIA), and a <b>men's or women's sport</b>; each result card shows the school's type next to its location. There's a <b>Pre-Professional / Transfer</b> group with <b>Pre-Engineering (incl. 3+2)</b>, <b>Pre-Health</b>, <b>Pre-Law</b>, and <b>Liberal Arts</b> for schools that offer two-year preparatory tracks before transferring or applying to professional school. Each result is labeled with its <b>division</b>, shows <b>cost</b> (net price &amp; tuition), <b>admission rate</b>, <b>SAT/ACT middle-50%</b>, and a green ✓ for each of your selected majors the school offers. <b>Star (☆)</b> schools to add them to <b>Compare</b>. Use <b>Show 25 / 50 / 100</b> for page size and the <b>⬇ Show more</b> button under the results to load the rest. When a sport filter is on, every card shows a <b>✓ Sponsors</b> confirmation for that sport. <b>Note:</b> majors are OR (any one is enough), but division/sport/state filters are AND. If you've entered ACT/SAT above, you'll also get an <b>academic match</b> badge — <span class="tag likely">Likely</span> <span class="tag target">Target</span> <span class="tag reach">Reach</span> — comparing your scores to the school's ranges and selectivity. It's an <i>estimate</i>, not a guarantee (recruited athletes may get extra admissions support). Data is the federal College Scorecard; only your search terms are sent — your scores stay in your browser.</p>
 
     <h3>7 · Save or share</h3>
     <ul>
@@ -492,6 +492,7 @@ Freshman S1,Band,Elective / Non-Core,95,1,Regular,No</pre>
     <div class="row noprint" style="gap:10px">
       <input id="cSchool" placeholder="School name (e.g. Ohio State)" style="flex:1;min-width:160px" onkeydown="if(event.key==='Enter')searchColleges()" aria-label="School name to search">
       <select id="cState" style="width:120px" aria-label="Filter by state"></select>
+      <select id="cType" style="width:150px" aria-label="Filter by public or private school"></select>
       <div id="cMajorWrap" style="position:relative;width:220px">
         <button type="button" id="cMajorBtn" onclick="toggleMajorPicker(event)" aria-haspopup="listbox" aria-expanded="false" class="sec" style="width:100%;text-align:left;padding:6px 10px;border-color:var(--line);color:var(--ink);background:var(--input-bg);font-weight:normal;display:flex;justify-content:space-between;align-items:center;gap:6px">
           <span id="cMajorBtnLabel" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Any major</span>
@@ -517,7 +518,7 @@ Freshman S1,Band,Elective / Non-Core,95,1,Regular,No</pre>
       <button class="sec" onclick="searchColleges()">Search</button>
       <button class="sec" id="cCompareBtn" onclick="openCompare()" style="display:none">⭐ Compare (0)</button>
     </div>
-    <p class="note">Live data from the U.S. Dept. of Education <b>College Scorecard</b>; NCAA/NAIA <b>division</b> &amp; <b>sport</b> data from the federal <b>EADA</b> survey (2024-25). The <b>academic match</b> uses the ACT/SAT you entered above — your grades/scores stay in your browser; only the school search terms are sent. Tip: pick a <b>state</b> (or name) to browse, then narrow by division or sport.</p>
+    <p class="note">Live data from the U.S. Dept. of Education <b>College Scorecard</b>; NCAA/NAIA <b>division</b> &amp; <b>sport</b> data from the federal <b>EADA</b> survey (2024-25). The <b>academic match</b> uses the ACT/SAT you entered above — your grades/scores stay in your browser; only the school search terms are sent. Tip: pick a <b>state</b> (or name) to browse, then narrow by <b>public/private</b>, division, or sport.</p>
     <div id="cResults" style="margin-top:8px"></div>
     <details class="noprint" style="margin:6px 0 4px">
       <summary style="cursor:pointer;color:var(--navy);font-weight:600;font-size:.88rem">What do Likely / Target / Reach mean? <span class="small" style="color:var(--muted);font-weight:400">(click to expand)</span></summary>
@@ -984,6 +985,8 @@ let _selectedMajors=[];   // array of values like "fam:engineering" or "cip:1419
 function initCollege(){
   const st=document.getElementById('cState');
   if(st && !st.options.length) st.innerHTML='<option value="">Any state</option>'+SC_STATES.map(s=>`<option>${s}</option>`).join('');
+  const ct=document.getElementById('cType');
+  if(ct && !ct.options.length) ct.innerHTML='<option value="">Public &amp; private</option><option value="1">Public only</option><option value="2">Private (non-profit)</option><option value="3">Private (for-profit)</option>';
   // Multi-select major panel
   const mp=document.getElementById('cMajorOptions');
   if(mp && !mp.children.length){
@@ -1098,7 +1101,7 @@ async function searchColleges(){
   if(!name && !state && !majors.length){ box.innerHTML='<p class="note">Enter a school name, pick a state, or choose one or more majors to search.</p>'; return; }
   box.innerHTML='<p class="note">Searching…</p>';
   const fields=['id','school.name','school.city','school.state','school.school_url','latest.student.size',
-    'school.degrees_awarded.predominant','school.degrees_awarded.highest',
+    'school.ownership','school.degrees_awarded.predominant','school.degrees_awarded.highest',
     'latest.admissions.admission_rate.overall',
     'latest.admissions.sat_scores.25th_percentile.critical_reading','latest.admissions.sat_scores.25th_percentile.math',
     'latest.admissions.sat_scores.75th_percentile.critical_reading','latest.admissions.sat_scores.75th_percentile.math',
@@ -1110,11 +1113,13 @@ async function searchColleges(){
   famKeys.forEach(k=>fields.push('latest.academics.program_percentage.'+k));
   if(cipCodes.length) fields.push('latest.programs.cip_4_digit.code');
   const want=+val('cResultCount')||25;
+  const wantOwn=val('cType');   // '' any, '1' public, '2' private non-profit, '3' private for-profit
   const wantDivSet=effectiveDivisionSet(), wantSport=val('cSport');
   const sportBit = wantSport? SC_SPORTS.indexOf(wantSport.split(':')[1]) : -1;
   const sportG = wantSport? wantSport.split(':')[0] : null;
   const keep=(r)=>{
     if((+r['school.degrees_awarded.highest']||0)<3) return false;
+    if(wantOwn && String(r['school.ownership'])!==wantOwn) return false;
     // OR-logic for majors: school must offer at least ONE of the selected majors
     if(majors.length){
       const offered = cipCodes.length ? (r['latest.programs.cip_4_digit']||[]).map(p=>String(p.code)) : [];
@@ -1158,6 +1163,7 @@ async function searchColleges(){
   if(state) base.set('school.state',state);
   if(cipCodes.length) base.set('latest.programs.cip_4_digit.code',cipCodes.join(','));   // OR via comma
   base.set('school.operating','1'); base.set('school.degrees_awarded.predominant__range','3..4');
+  if(wantOwn) base.set('school.ownership',wantOwn);
   base.set('fields',fields.join(',')); base.set('sort','latest.student.size:desc'); base.set('per_page','100');
   try{
     let kept=[], total=0, page=0; const maxPages=6;
@@ -1209,6 +1215,7 @@ async function searchColleges(){
             for(const r of (xd.results||[])){
               if(have.has(String(r['id']))) continue;
               if((+r['school.degrees_awarded.highest']||0)<3) continue;   // 4-year institutions only
+              if(wantOwn && String(r['school.ownership'])!==wantOwn) continue;   // fetch-by-id bypasses base params
               kept.push(r);
             }
           }
@@ -1248,6 +1255,8 @@ async function loadMoreColleges(){
   s.kept.sort((a,b)=>(+b['latest.student.size']||0)-(+a['latest.student.size']||0));
   renderSearchPage();
 }
+const SC_OWN_LABEL={1:'Public',2:'Private non-profit',3:'Private for-profit'};
+function scOwn(r){ return SC_OWN_LABEL[+r['school.ownership']]||null; }
 function scPct(x){ return x!=null?Math.round(x*100)+'%':'—'; }
 function scMoney(x){ return x!=null?'$'+(+x).toLocaleString():'—'; }
 function satRange(r){ const a=r['latest.admissions.sat_scores.25th_percentile.critical_reading'],b=r['latest.admissions.sat_scores.25th_percentile.math'],c=r['latest.admissions.sat_scores.75th_percentile.critical_reading'],e=r['latest.admissions.sat_scores.75th_percentile.math']; return (a&&b&&c&&e)?[a+b,c+e]:null; }
@@ -1317,6 +1326,7 @@ function renderColleges(rows, majors, info){
       </div>
       <div class="meta">
         <span>${esc(r['school.city']||'')}, ${esc(r['school.state']||'')}</span>
+        ${scOwn(r)?`<span><b>${scOwn(r)}</b></span>`:''}
         <span><b>Admit rate:</b> ${scPct(r['latest.admissions.admission_rate.overall'])}</span>
         <span><b>SAT mid-50:</b> ${sr?sr[0]+'–'+sr[1]:'—'}</span>
         <span><b>ACT mid-50:</b> ${arr?arr[0]+'–'+arr[1]:'—'}</span>
@@ -1349,6 +1359,7 @@ function openCompare(){
     const rowsFor=(label,fn)=>'<tr><th>'+label+'</th>'+ids.map(id=>'<td>'+fn(favs[id])+'</td>').join('')+'</tr>';
     let h='<table class="cmp"><tr><th>School</th>'+ids.map(id=>{const r=favs[id];const a=athOf(id);return '<td><b>'+esc(r['school.name'])+'</b> <button class="star" onclick="toggleFav(\''+id+'\');openCompare()" title="Remove" aria-label="Remove">★</button>'+(a?'<br><span class="badge divb">'+SC_DIV_LABEL[a[0]]+'</span>':'')+'</td>';}).join('')+'</tr>';
     h+=rowsFor('Location',r=>esc((r['school.city']||'')+', '+(r['school.state']||'')));
+    h+=rowsFor('Type',r=>scOwn(r)||'—');
     h+=rowsFor('Admit rate',r=>scPct(r['latest.admissions.admission_rate.overall']));
     h+=rowsFor('SAT mid-50',r=>{const x=satRange(r);return x?x[0]+'–'+x[1]:'—';});
     h+=rowsFor('ACT mid-50',r=>{const x=actRange(r);return x?x[0]+'–'+x[1]:'—';});
