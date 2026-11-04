@@ -77,6 +77,10 @@ Open **Grading scale settings** and set the cutoffs to match your school exactly
 common 7-point (A ≥ 93) and 10-point (A ≥ 90) scales. You can also set the Honors/AP bonus and the
 DI / DII / NAIA pass thresholds here.
 
+If your school reports a 10-point GPA but does **not** upgrade grades that failed on the 7-point scale
+(a 66% stays an F rather than becoming a D), tick **7-pt F stays F on 10-pt** under **Scale conversion**.
+The setting is saved with your profile and share link.
+
 ### 3. Add test scores (optional)
 In the **Test scores** card, enter the **ACT composite** and/or **SAT total**. These feed the **NAIA** check.
 **Note:** the NCAA no longer uses ACT/SAT for DI/DII initial eligibility (permanent since 2023), so scores don't change the NCAA result — the app states this inline.
@@ -94,10 +98,10 @@ use the **View** toggle above the results to switch between **Completed only** a
 ### 6. Explore colleges (optional)
 In **College search & match**, search by school name, state, and/or major, then narrow by **NCAA/NAIA division** and a **men's or women's sport**. Each result is labeled with its **division** and shows **cost** (net price & tuition), **admission rate**, and **SAT/ACT middle-50%** ranges, with a link to the school. If you entered ACT/SAT, you also get an **academic match** badge — **Likely / Target / Reach** — comparing your scores to the school's ranges and selectivity.
 - *Estimate only*, not a guarantee; recruited athletes may receive extra admissions support.
-- Data: U.S. Dept. of Education **College Scorecard** (cost/admissions/majors) + **EADA 2024-25** (`athletics.json` — division & sponsored sports for ~1,300 NCAA DI/DII/DIII + NAIA schools, joined by IPEDS id).
+- Data: U.S. Dept. of Education **College Scorecard** (cost/admissions/majors) + `athletics.json` — division & sponsored sports for ~1,300 schools, joined by IPEDS id. NCAA members come from the **NCAA Member Directory (2026-27 sponsored sports)**; NAIA members from **EADA 2024-25**. Rebuild with `tools/build_athletics.py` (see the script header).
 - Only your search terms are sent — your grades/scores stay in the browser.
 - Uses a free `api.data.gov` key (`SCORECARD_KEY` in `index.html`); get your own at <https://api.data.gov/signup/> if forking.
-- The men's/women's sport filter currently lists the 6 most-sponsored sports per gender (editable via `SPORT_FILTER` in `index.html`).
+- The men's/women's sport filter lists every sport with verified sponsorship data (editable via `SPORT_FILTER` in `index.html`).
 - *Browsing tip:* pick a **state** when filtering by division/sport (the API returns a state's 4-year schools, which are then filtered locally).
 - **Results count:** a **Show 25 / 50 / 100** selector controls how many results display; the search pages through the API as needed to fill it. Filters are an **AND** (a school must match every active filter) — to find one specific school, type its **name** and leave the other filters on "Any."
 
