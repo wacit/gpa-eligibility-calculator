@@ -88,6 +88,7 @@ In the **Test scores** card, enter the **ACT composite** and/or **SAT total**. T
 ### 4. Read the results
 - **Overall GPA** — your full GPA on both scales, unweighted and weighted (green = the 10-point result).
 - **NCAA Core GPA** — core-academic courses only, no weighting; badges show pass/fail vs **DI ≥ 2.3** and **DII ≥ 2.2**, and it tracks progress toward the 16 required core units.
+- **NCAA core-course requirements** — a Division I / Division II table of the 16 units by subject area (English, math, science, additional English/math/science, social science, additional core), with what is counted, what is still needed, and the Division I "10 before senior year, 7 in English/math/science" check.
 - **NAIA Eligibility** — the **"2 of 3"** rule: overall GPA ≥ 2.3, test leg (**ACT ≥ 18 / SAT ≥ 970**), or top-50% class rank. Two legs met → **QUALIFIES**; one leg met → still needs the top-50% rank leg.
 
 ### 5. Project the senior year (optional)
@@ -96,7 +97,7 @@ use the **View** toggle above the results to switch between **Completed only** a
 **Projected (incl. planned)** to see where the GPA is headed at graduation.
 
 ### 6. Explore colleges (optional)
-In **College search & match**, search by school name, state, and/or major, then narrow by **NCAA/NAIA division** and a **men's or women's sport**. Each result is labeled with its **division** and shows **cost** (net price & tuition), **admission rate**, and **SAT/ACT middle-50%** ranges, with a link to the school. If you entered ACT/SAT, you also get an **academic match** badge — **Likely / Target / Reach** — comparing your scores to the school's ranges and selectivity.
+In **College search & match**, search by school name, state, and/or major, then narrow by **NCAA/NAIA division** and a **men's or women's sport**. Each result is labeled with its **division** and shows **cost** (net price & tuition), **admission rate**, and **SAT/ACT middle-50%** ranges, with a link to the school. If you entered ACT/SAT, you also get an **academic match** badge — **Likely / Target / Reach** — comparing your scores to the school's ranges and selectivity. Use the **Any match** dropdown to show only Likely, Target and/or Reach schools (schools with no estimate are hidden while it's on).
 - *Estimate only*, not a guarantee; recruited athletes may receive extra admissions support.
 - Data: U.S. Dept. of Education **College Scorecard** (cost/admissions/majors) + `athletics.json` — division & sponsored sports for ~1,300 schools, joined by IPEDS id. NCAA members come from the **NCAA Member Directory (2026-27 sponsored sports)**; NAIA members from **EADA 2024-25**. Rebuild with `tools/build_athletics.py` (see the script header).
 - Only your search terms are sent — your grades/scores stay in the browser.
@@ -218,9 +219,13 @@ it's a static site. Output/publish directory = the folder containing `index.html
 ## Methodology & disclaimer
 
 - **NCAA core GPA**: core-academic courses only; no Honors/AP weighting; no +/-; each core
-  semester = 0.5 unit; failing grades earn 0 units (consistent with the "best 16 core courses"
-  rule). 16 core units are required by graduation (10, including 7 in English/Math/Science,
-  before the 7th semester).
+  semester = 0.5 unit, scaled by the row's credit hours (quarter course = half, full-year row =
+  double; the standard credit value is auto-detected or set with **Credits/course**); failing
+  grades earn 0 units (consistent with the "best 16 core courses" rule).
+- **NCAA core-course distribution**: 16 units by area — DI: 4 English, 3 math, 2 science,
+  1 additional English/math/science, 2 social science, 4 additional core; DII: 3 / 2 / 2 / 3 / 2 / 4.
+  Surplus units roll down to the "additional" lines. DI also needs 10 units before senior year
+  (7 in English/math/science), checked from the Term labels. Lab science is not checked.
 - **NAIA**: uses the overall (cumulative) GPA on a 4.0 scale; GPA ≥ 2.3 is one of three
   requirements, of which a student must meet at least two (GPA, test score, or top-50% rank).
 

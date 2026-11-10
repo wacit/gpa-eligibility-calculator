@@ -188,7 +188,7 @@ if('serviceWorker' in navigator){
     <h3>4 · Read the results</h3>
     <ul>
       <li><b>Overall GPA</b> — your full GPA on both scales, unweighted and weighted. Green = the 10-point (new) result.</li>
-      <li><b>NCAA Core GPA</b> — uses core-academic courses only, no weighting. The badges show pass/fail vs <span class="tag pass">DI ≥2.3</span> and <span class="tag pass">DII ≥2.2</span>, and it tracks progress toward the 16 required core units.</li>
+      <li><b>NCAA Core GPA</b> — uses core-academic courses only, no weighting. The badges show pass/fail vs <span class="tag pass">DI ≥2.3</span> and <span class="tag pass">DII ≥2.2</span>, and it tracks progress toward the 16 required core units. The <b>NCAA core-course requirements</b> table under the results breaks those 16 units down by subject area for Division I and Division II and shows exactly what is still needed.</li>
       <li><b>NAIA Eligibility</b> — checks the <b>"2 of 3"</b> rule: overall GPA ≥ 2.3, test leg (<b>ACT ≥ 18 / SAT ≥ 970</b>), or top-50% class rank. If two are met it shows <span class="tag pass">QUALIFIES</span>; if only the GPA or test leg is met it shows it still needs the top-50% rank leg.</li>
     </ul>
 
@@ -416,6 +416,7 @@ Freshman S1,Band,Elective / Non-Core,95,1,Regular,No</pre>
         </fieldset>
         <fieldset><legend>NCAA / NAIA</legend>
           <label>NCAA unit/course <input type="number" step="0.5" id="ncaaUnit" value="0.5" aria-label="NCAA credit units per semester course"></label>
+          <label title="How many of your school's credit hours one standard (semester) course is worth. NCAA units are scaled from each row's Credit Hours: a row with this many credits earns the 'NCAA unit/course' value, half as many earns half, a full-year row with twice as many earns double. Leave blank to auto-detect (the most common credit value among your core courses).">Credits/course <input type="number" step="0.25" min="0" id="semCredits" placeholder="auto" aria-label="School credit hours for one standard course (blank = auto-detect)"></label>
           <label>DI min <input type="number" step="0.1" id="diMin" value="2.3" aria-label="NCAA Division I minimum GPA"></label>
           <label>DII min <input type="number" step="0.1" id="diiMin" value="2.2" aria-label="NCAA Division II minimum GPA"></label>
           <label>NAIA min <input type="number" step="0.1" id="naiaMin" value="2.3" aria-label="NAIA minimum GPA"></label>
@@ -484,6 +485,19 @@ Freshman S1,Band,Elective / Non-Core,95,1,Regular,No</pre>
         <p class="note">Meet <b>2 of 3</b>: overall GPA ≥ <span id="naiaMinL">2.3</span>, test leg (ACT ≥ 18 / SAT ≥ 970), or top-50% class rank. Fill in test score and/or class rank above to evaluate those legs.</p>
       </div>
     </div>
+    <div class="res" style="margin-top:14px">
+      <h3>NCAA core-course requirements <span class="small">(16 units, by subject area)</span></h3>
+      <div class="row noprint small" id="distScaleRow" style="display:none;gap:14px;margin-bottom:6px">
+        <span><b>Count units earned on:</b></span>
+        <label><input type="radio" name="ds" value="10" checked onchange="setDistScale('10')"> 10-point letters</label>
+        <label><input type="radio" name="ds" value="7" onchange="setDistScale('7')"> 7-point letters</label>
+      </div>
+      <div style="overflow:auto"><table id="distTable" aria-label="NCAA core-course distribution for Division I and Division II"></table></div>
+      <p class="note" id="distEarned"></p>
+      <p class="note" id="distNeed"></p>
+      <p class="note" id="distJunior"></p>
+      <p class="note">Extra units in a subject roll down: surplus English/math/science fills the "additional English, math or science" line, and any surplus after that (plus foreign language and other approved academic courses) fills the "additional core" line. <b>Lab science:</b> both divisions require one year of lab science within the science units if your school offers it — Biology, Chemistry and Physics normally qualify; this tool can't check it. Only courses on your school's NCAA-approved core list count.</p>
+    </div>
     <div class="row noprint" style="margin-top:14px">
       <button class="sec" onclick="exportResults()">Export results (CSV)</button>
       <button class="sec" onclick="exportCourses()">Export courses (CSV)</button>
@@ -520,6 +534,14 @@ Freshman S1,Band,Elective / Non-Core,95,1,Regular,No</pre>
         </div>
       </div>
       <select id="cSport" style="width:175px" aria-label="Filter by sport"></select>
+      <select id="cMatch" style="width:150px" onchange="searchColleges()" aria-label="Filter by academic match (Likely, Target, Reach)">
+        <option value="">Any match</option>
+        <option value="likely">Likely only</option>
+        <option value="likely,target">Likely + Target</option>
+        <option value="target">Target only</option>
+        <option value="target,reach">Target + Reach</option>
+        <option value="reach">Reach only</option>
+      </select>
       <select id="cResultCount" style="width:120px" onchange="searchColleges()" aria-label="Number of results to show"></select>
       <button class="sec" onclick="searchColleges()">Search</button>
       <button class="sec" id="cCompareBtn" onclick="openCompare()" style="display:none">⭐ Compare (0)</button>
@@ -534,6 +556,7 @@ Freshman S1,Band,Elective / Non-Core,95,1,Regular,No</pre>
         <p style="margin:4px 0"><span class="badge target">Match: Target</span> Your scores sit <b>inside the school's middle-50%</b> — you look academically competitive. Roughly half of admitted students had scores like yours. A solid bet to apply.</p>
         <p style="margin:4px 0"><span class="badge reach">Match: Reach</span> Your scores are <b>below the school's 25th percentile</b>, or it admits fewer than 25% of applicants (highly selective). Possible but uncertain — apply only with a balanced college list.</p>
         <p style="margin:6px 0 2px"><b>Adjustments the badge makes:</b> if the school's admission rate is under 25%, every match shifts one level harder (Likely→Target, Target→Reach). If a school admits 85%+ and your scores aren't below their range, it always shows Likely.</p>
+        <p style="margin:6px 0 2px"><b>Filtering by match:</b> use the <b>Any match</b> dropdown beside the sport filter to show only Likely, Target and/or Reach schools. Schools with no estimate (no ACT/SAT entered, or the school reports no test data) are hidden while a match filter is on.</p>
         <p style="margin:6px 0 2px;color:var(--muted)"><b>Important caveats:</b> this is a quick screen, not a prediction. Admissions also weigh GPA, essays, recommendations, course rigor, demonstrated interest, and (for athletes) <b>coach support</b> — a recruited athlete with coach interest can be admitted to a Reach school they'd otherwise miss. Always cross-check with the college and your counselor.</p>
       </div>
     </details>
@@ -544,7 +567,8 @@ Freshman S1,Band,Elective / Non-Core,95,1,Regular,No</pre>
     <details><summary>Methodology &amp; disclaimers</summary>
       <div class="small" style="margin-top:10px">
         <p><b>Overall GPA:</b> percentage → letter via the chosen scale → points (A=4…F=0). Weighted adds the Honors/AP bonus to passing grades, then averages by credit hours.</p>
-        <p><b>NCAA core GPA:</b> only core-academic courses count — English, Math (Algebra I+), Natural/Physical Science, Social Science, Foreign Language, and Other Academic. Electives such as Band, PE, Health, Personal Finance, and study halls are excluded. <b>No</b> honors/AP weighting and <b>no</b> +/-. Each core semester course = 0.5 unit. A failing grade earns 0 units (consistent with the NCAA “best 16 core courses” rule). DI full qualifier ≥ 2.3, DII ≥ 2.2. 16 core units are required by graduation (10, incl. 7 in Eng/Math/Sci, before the 7th semester).</p>
+        <p><b>NCAA core GPA:</b> only core-academic courses count — English, Math (Algebra I+), Natural/Physical Science, Social Science, Foreign Language, and Other Academic. Electives such as Band, PE, Health, Personal Finance, and study halls are excluded. <b>No</b> honors/AP weighting and <b>no</b> +/-. Each core semester course = 0.5 unit; units scale with the row’s <b>Credit Hours</b> (a quarter-length course earns half as much, a full-year row double — the standard credit value is auto-detected, or set <b>Credits/course</b> in grading settings). A failing grade earns 0 units (consistent with the NCAA “best 16 core courses” rule). DI full qualifier ≥ 2.3, DII ≥ 2.2.</p>
+        <p><b>NCAA core-course requirements:</b> the 16 units must fall in specific areas. <b>Division I:</b> 4 English, 3 math (Algebra I+), 2 natural/physical science, 1 additional English/math/science, 2 social science, 4 additional from any core area (incl. foreign language, comparative religion, philosophy). <b>Division II:</b> 3 English, 2 math, 2 science, 3 additional English/math/science, 2 social science, 4 additional. Both need 1 year of lab science if offered. Surplus units in one area roll down to the “additional” lines. Division I also requires 10 units before senior year (7 in English/math/science), which is checked from the Term labels.</p>
         <p><b>NAIA:</b> uses the student’s overall (cumulative) GPA on a 4.0 scale. A 2.3 overall GPA satisfies one of NAIA’s three requirements; a student must meet at least two of: GPA ≥ 2.3, ACT 18/SAT 970, or top-50% class rank.</p>
         <p><b>Verify with officials.</b> Confirm your school’s exact grading scale and weighting, and check the school’s official NCAA-approved core-course list at the NCAA Eligibility Center. This tool is for planning only and does not determine eligibility.</p>
       </div>
@@ -608,6 +632,95 @@ function noUpgradeF(){ const e=document.getElementById('noUpgradeF'); return !!(
 function letter10(pct,s7,s10){ const l7=letter(pct,s7); return (noUpgradeF()&&l7==="F") ? "F" : letter(pct,s10); }
 function isCore(cat){ return CORE_CATS.includes(cat); }
 
+/* ---------- NCAA units from credit hours + core-course distribution ---------- */
+// One "standard course" (the "NCAA unit/course" setting, 0.5 by default) is worth this many school credits.
+// Blank setting = auto-detect: the most common credit value among core rows (a tie goes to the larger
+// value, the conservative reading — it yields fewer units, never more).
+function unitBase(){
+  const o=parseFloat(val('semCredits'))||0; if(o>0) return o;
+  const cnt={};
+  for(const d of data){ if(!isCore(d.cat)) continue; const h=+d.hrs||0; if(h>0) cnt[h]=(cnt[h]||0)+1; }
+  let best=0,bn=0;
+  for(const [h,n] of Object.entries(cnt)){ if(n>bn||(n===bn&&+h>best)){ best=+h; bn=n; } }
+  return best;
+}
+// Units scale with the row's credit hours (quarter course = half a semester's units, full-year row = double).
+// A row with no credit hours (e.g. a failed course the transcript lists at 0.0) falls back to one standard course.
+function unitsFor(d,unit,base){ const h=+d.hrs||0; return (h>0&&base>0)? unit*h/base : unit; }
+// Units formatter: one decimal normally, two when needed (0.25-unit quarter courses).
+function fu(x){ const r=Math.round(x*100)/100; return Math.abs(r*10-Math.round(r*10))<1e-9 ? r.toFixed(1) : r.toFixed(2); }
+// School year (9-12) from a term label such as "Junior S1", "11th grade", "Sr Fall"; null if it can't be told.
+function termYear(t){
+  t=String(t||'').toLowerCase();
+  if(/senior|\bsr\b|\b12(th)?\b/.test(t)) return 12;
+  if(/junior|\bjr\b|\b11(th)?\b/.test(t)) return 11;
+  if(/soph|\bso\b|\b10(th)?\b/.test(t)) return 10;
+  if(/fresh|\bfr\b|\b9(th)?\b/.test(t)) return 9;
+  return null;
+}
+// NCAA initial-eligibility core-course distribution (units). Both divisions total 16.
+const NCAA_DIST={
+  DI:  {eng:4, math:3, sci:2, ems:1, ss:2, any:4},
+  DII: {eng:3, math:2, sci:2, ems:3, ss:2, any:4}
+};
+const DIST_ROWS=[
+  ['eng','English','English'],
+  ['math','Math (Algebra I or higher)','math'],
+  ['sci','Natural / physical science','science'],
+  ['ems','Additional English, math or science','English/math/science'],
+  ['ss','Social science','social science'],
+  ['any','Additional core (any area, incl. foreign language)','any core area']
+];
+// Fill each requirement line from the units earned per subject; surplus rolls down to the "additional" lines.
+function distAlloc(a,req){
+  const E=a['English']||0, M=a['Math']||0, S=a['Science']||0, SS=a['Social Science']||0;
+  const O=(a['Foreign Language']||0)+(a['Other Academic']||0);
+  const eng=Math.min(E,req.eng), math=Math.min(M,req.math), sci=Math.min(S,req.sci);
+  const spare=(E-eng)+(M-math)+(S-sci);
+  const ems=Math.min(spare,req.ems);
+  const ss=Math.min(SS,req.ss);
+  const any=Math.min((spare-ems)+(SS-ss)+O, req.any);
+  const have={eng,math,sci,ems,ss,any};
+  return {have, total:eng+math+sci+ems+ss+any};
+}
+let distScale='10', _distExport=null;
+function setDistScale(v){ distScale=v; compute(); }
+function renderDist(a7,a10,pre7,pre10,projected){
+  const tb=document.getElementById('distTable'); if(!tb) return;
+  // The two scales only disagree when a grade fails on one and passes on the other; offer a choice only then.
+  const differ=CORE_CATS.some(c=>Math.abs((a7[c]||0)-(a10[c]||0))>1e-9);
+  const sr=document.getElementById('distScaleRow'); if(sr) sr.style.display=differ?'flex':'none';
+  const use7=differ && distScale==='7';
+  const a=use7?a7:a10, pre=use7?pre7:pre10;
+  const tot=CORE_CATS.reduce((x,c)=>x+(a[c]||0),0);
+  const al={DI:distAlloc(a,NCAA_DIST.DI), DII:distAlloc(a,NCAA_DIST.DII)};
+  const cells=(have,need)=>{ const short=need-have;
+    return `<td>${fu(have)} / ${need}</td><td>${short<0.005?'<span class="badge pass">Met</span>':`<span class="badge pend">Need ${fu(short)}</span>`}</td>`; };
+  let h='<tr><th class="l">Requirement</th><th>Division I<br><span class="small">counted / required</span></th><th>DI status</th><th>Division II<br><span class="small">counted / required</span></th><th>DII status</th></tr>';
+  for(const [k,label] of DIST_ROWS)
+    h+=`<tr><td class="l">${label}</td>${cells(al.DI.have[k],NCAA_DIST.DI[k])}${cells(al.DII.have[k],NCAA_DIST.DII[k])}</tr>`;
+  h+=`<tr style="font-weight:700"><td class="l">Total counted toward 16</td>${cells(al.DI.total,16)}${cells(al.DII.total,16)}</tr>`;
+  tb.innerHTML=h;
+  const basis=(differ?(use7?'7-point letters':'10-point letters')+', ':'')+(projected?'projected — includes planned courses':'completed courses');
+  set('distEarned', tot? `Core units earned (${basis}): `+CORE_CATS.map(c=>`${c} ${fu(a[c]||0)}`).join(' · ')+` — ${fu(tot)} total.` : 'Enter graded core courses above to see progress toward each requirement.');
+  const need=(div)=>{ const A=al[div], R=NCAA_DIST[div];
+    const parts=DIST_ROWS.map(([k,,short])=>[R[k]-A.have[k],short]).filter(x=>x[0]>=0.005).map(x=>`${fu(x[0])} ${x[1]}`);
+    const extra=tot-A.total;
+    return (parts.length? `<b>${fu(16-A.total)} more unit${Math.abs(16-A.total-1)<0.005?'':'s'}</b> — ${parts.join(' · ')}` : '<b>all 16 units covered ✓</b>')
+      + (extra>=0.005? ` <span class="small">(${fu(extra)} earned unit${Math.abs(extra-1)<0.005?' is':'s are'} surplus and don't count)</span>` : ''); };
+  document.getElementById('distNeed').innerHTML = tot? `<b>Still needed</b> — Division I: ${need('DI')}. Division II: ${need('DII')}.` : '';
+  const mark=(have,min)=> have>=min-0.005 ? '✓' : `— short ${fu(min-have)}`;
+  let j='';
+  if(tot){
+    if(pre.tot+pre.sr<=0) j='<b>Division I 10/7 rule:</b> 10 core units must be completed before senior year, 7 of them in English, math or science. Label each term Freshman / Sophomore / Junior / Senior (or 9th–12th) to check this.';
+    else j=`<b>Division I 10/7 rule</b> (before senior year): ${fu(pre.tot)} core units of the 10 required ${mark(pre.tot,10)} · ${fu(pre.ems)} in English/math/science of the 7 required ${mark(pre.ems,7)}. Grades in those English/math/science courses lock in when senior year starts.`
+      + (pre.unk>=0.005? ` ${fu(pre.unk)} unit${Math.abs(pre.unk-1)<0.005?' is':'s are'} in terms without a recognizable school year and not counted here.` : '');
+  }
+  document.getElementById('distJunior').innerHTML=j;
+  const d7=distAlloc(a7,NCAA_DIST.DI), d10=distAlloc(a10,NCAA_DIST.DI), e7=distAlloc(a7,NCAA_DIST.DII), e10=distAlloc(a10,NCAA_DIST.DII);
+  _distExport={di:[fu(d7.total),fu(d10.total)], dii:[fu(e7.total),fu(e10.total)], pre:[fu(pre7.tot),fu(pre10.tot)], preEms:[fu(pre7.ems),fu(pre10.ems)]};
+}
+
 let viewMode = 'projected';
 function setView(m){ viewMode=m; compute(); }
 function blankRow(){ return {term:"",course:"",cat:"English",pct:"",hrs:1,track:"Regular",planned:false,failed:false}; }
@@ -647,7 +760,10 @@ function esc(s){ return (s||"").replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
 function upd(i,k,v){ data[i][k]=v; if(k==='pct'||k==='cat'||k==='track'||k==='hrs') render(); else { data[i][k]=v; compute(); save(); } }
 
 function compute(){
-  const s7=scale7(), s10=scale10(), unit=num('ncaaUnit');
+  const s7=scale7(), s10=scale10(), unit=num('ncaaUnit'), base=unitBase();
+  const a7={}, a10={}, pre7={tot:0,ems:0,sr:0,unk:0}, pre10={tot:0,ems:0,sr:0,unk:0};
+  const tally=(a,pre,cat,u,yr)=>{ a[cat]=(a[cat]||0)+u;
+    if(yr==null) pre.unk+=u; else if(yr>=12) pre.sr+=u; else { pre.tot+=u; if(cat==='English'||cat==='Math'||cat==='Science') pre.ems+=u; } };
   let oh=0, o7u=0,o7w=0,o10u=0,o10w=0;
   let n7q=0,n7u=0,n10q=0,n10u=0;
   let planned=0, earned=0, courses=0, failedN=0;
@@ -667,8 +783,9 @@ function compute(){
     courses++;
     if(L7==="F") failedN++; else earned+=hrs;
     if(isCore(d.cat)){
-      if(L7!=="F"){ n7u+=unit; n7q+=p7*unit; }
-      if(L10!=="F"){ n10u+=unit; n10q+=p10*unit; }
+      const u=unitsFor(d,unit,base), yr=termYear(d.term);
+      if(L7!=="F"){ n7u+=u; n7q+=p7*u; tally(a7,pre7,d.cat,u,yr); }
+      if(L10!=="F"){ n10u+=u; n10q+=p10*u; tally(a10,pre10,d.cat,u,yr); }
     }
   }
   const f=(x)=> x.toFixed(2);
@@ -679,14 +796,17 @@ function compute(){
   if(ck) ck.innerHTML = oh? `<b>Check against your transcript:</b> ${courses} graded courses · <b>${oh.toFixed(1)} credits attempted</b> · <b>${earned.toFixed(1)} earned</b>${failedN?` (${failedN} failed)`:''}. These totals should match the credit summary printed on the transcript — if they don't, a course is missing or a credit value is off.` : '';
 
   const g7 = n7u? n7q/n7u : null, g10 = n10u? n10q/n10u : null;
-  set('nc7', g7!=null?f3(g7):'–'); set('nu7', n7u.toFixed(1));
-  set('nc10', g10!=null?f3(g10):'–'); set('nu10', n10u.toFixed(1));
+  set('nc7', g7!=null?f3(g7):'–'); set('nu7', fu(n7u));
+  set('nc10', g10!=null?f3(g10):'–'); set('nu10', fu(n10u));
   badge('b7di', g7, num('diMin'), 'DI');
   badge('b7dii', g7, num('diiMin'), 'DII');
   badge('b10di', g10, num('diMin'), 'DI');
   badge('b10dii', g10, num('diiMin'), 'DII');
   const unitsHave=Math.max(n7u,n10u);
-  set('ncaaUnitsNote', `${unitsHave.toFixed(1)} core units entered (16 required by graduation). ` + (unitsHave<16?'More core courses still needed.':'Meets the 16-unit count.'));
+  const semOverride=(parseFloat(val('semCredits'))||0)>0;
+  set('ncaaUnitsNote', `${fu(unitsHave)} core units earned of the 16 required by graduation — they must also fall in the right subject areas (see NCAA core-course requirements below).`
+    + (base>0? ` Units come from credit hours: ${fu(base)} credit${Math.abs(base-1)<0.005?'':'s'} = ${unit} unit (${semOverride?'set in grading settings':'auto-detected; override under Credits/course in grading settings'}).` : ''));
+  renderDist(a7,a10,pre7,pre10, viewMode==='projected' && planned>0);
 
   // NAIA: overall (unweighted) GPA + ACT/SAT + class rank "2 of 3" rule
   const naiaMin=num('naiaMin'), act=num('act'), sat=num('sat'), rank=num('rank');
@@ -751,7 +871,7 @@ function loadTests(){ try{ const s=JSON.parse(localStorage.getItem('naiaTests')|
 function val(id){ const e=document.getElementById(id); return e?e.value:''; }
 
 /* ---------- Save / load / share a full profile ---------- */
-const SETTING_IDS=['s7A','s7B','s7C','s7D','s10A','s10B','s10C','s10D','bH','bAP','bonusCOnly','noUpgradeF','ncaaUnit','diMin','diiMin','naiaMin'];
+const SETTING_IDS=['s7A','s7B','s7C','s7D','s10A','s10B','s10C','s10D','bH','bAP','bonusCOnly','noUpgradeF','ncaaUnit','semCredits','diMin','diiMin','naiaMin'];
 function gatherProfile(){
   const settings={}; SETTING_IDS.forEach(id=>{const e=document.getElementById(id); if(e) settings[id] = (e.type==='checkbox')? (e.checked?'1':'0') : e.value;});
   return {v:1, data:data, tests:{act:val('act'),sat:val('sat'),rank:val('rank')}, settings};
@@ -1161,8 +1281,11 @@ async function searchColleges(){
   const wantDivSet=effectiveDivisionSet(), wantSport=val('cSport');
   const sportBit = wantSport? SC_SPORTS.indexOf(wantSport.split(':')[1]) : -1;
   const sportG = wantSport? wantSport.split(':')[0] : null;
+  // Academic-match filter (Likely / Target / Reach). Schools with no estimate ("pend") never pass an active filter.
+  const wantMatch = val('cMatch')? new Set(val('cMatch').split(',')) : null;
   const keep=(r)=>{
     if((+r['school.degrees_awarded.highest']||0)<3) return false;
+    if(wantMatch && !wantMatch.has(matchLabel(r)[2])) return false;
     if(wantOwn && String(r['school.ownership'])!==wantOwn) return false;
     if(wantCost){
       const net=r['latest.cost.avg_net_price.public']!=null?r['latest.cost.avg_net_price.public']:r['latest.cost.avg_net_price.private'];
@@ -1319,7 +1442,7 @@ async function searchColleges(){
       }
     }
     kept.sort((a,b)=>(+b['latest.student.size']||0)-(+a['latest.student.size']||0));
-    _searchCursor = {base, keep, kept, page, total, majors, want, sport:wantSport, shown:Math.min(want,kept.length)||want};
+    _searchCursor = {base, keep, kept, page, total, majors, want, sport:wantSport, match:val('cMatch'), shown:Math.min(want,kept.length)||want};
     renderSearchPage();
   }catch(e){ box.innerHTML='<p class="note" style="color:var(--red)">Search failed: '+esc(e.message)+'. Check your connection or try again.</p>'; }
 }
@@ -1327,8 +1450,11 @@ let _searchCursor=null;
 function renderSearchPage(){
   const s=_searchCursor; if(!s) return;
   const moreApi = s.page*100 < s.total;
-  const hasMore = s.kept.length > s.shown || moreApi;
-  renderColleges(s.kept.slice(0,s.shown), s.majors, {shown:Math.min(s.kept.length,s.shown), found:s.kept.length, more:moreApi, hasMore, sport:s.sport});
+  // Re-check the match filter at render time so results stay consistent if ACT/SAT changes after the search.
+  const ms = s.match? new Set(s.match.split(',')) : null;
+  const list = ms? s.kept.filter(r=>ms.has(matchLabel(r)[2])) : s.kept;
+  const hasMore = list.length > s.shown || moreApi;
+  renderColleges(list.slice(0,s.shown), s.majors, {shown:Math.min(list.length,s.shown), found:list.length, more:moreApi, hasMore, sport:s.sport, match:s.match});
 }
 async function loadMoreColleges(){
   const s=_searchCursor; if(!s) return;
@@ -1378,14 +1504,16 @@ function matchLabel(r){
 function renderColleges(rows, majors, info){
   _scRows=rows; _scMajor=majors; _scInfo=info;
   const box=document.getElementById('cResults');
-  if(!rows.length){ box.innerHTML='<p class="note">No matching schools found. Try a different name'+(majors&&majors.length?' or fewer majors':'')+', or relax a filter.</p>'; return; }
+  // Explain an active Likely/Target/Reach filter — and why it can come up short without a test score.
+  const matchNote = info&&info.match ? `<p class="note" style="margin:2px 0 6px"><b>Match filter:</b> showing ${info.match.split(',').map(m=>m[0].toUpperCase()+m.slice(1)).join(' + ')} schools only — schools with no match estimate are hidden.${(num('sat')>0||num('act')>0)?'':' <b>No ACT/SAT is entered</b>, so no school can be rated yet — add a score under Test scores, then search again.'}</p>` : '';
+  if(!rows.length){ box.innerHTML=matchNote+'<p class="note">No matching schools found. Try a different name'+(majors&&majors.length?' or fewer majors':'')+', or relax a filter.</p>'; return; }
   rows.forEach(r=>{ _scById[String(r['id'])]=r; });
   const hdr = info? `<p class="note" style="margin:2px 0 6px"><b>${rows.length}</b> school${rows.length>1?'s':''} shown${info.found>rows.length?` of <b>${info.found}</b> found`:''}${info.hasMore?' — click <b>Show more</b> below for the rest':''}.</p>` : '';
   const famKeys = (majors||[]).filter(m=>m.startsWith('fam:')).map(m=>m.slice(4));
   const cipCodes = (majors||[]).filter(m=>m.startsWith('cip:')).map(m=>m.slice(4));
   // Sport-verification tag: when a sport filter is active, show explicit confirmation on every card
   const sportInfo = info&&info.sport? (()=>{ const [g,nm]=info.sport.split(':'); return {g, nm, bit:SC_SPORTS.indexOf(nm), lbl:(g==='m'?"Men's ":"Women's ")+nm}; })() : null;
-  box.innerHTML = hdr + rows.map(r=>{
+  box.innerHTML = hdr + matchNote + rows.map(r=>{
     const id=String(r['id']);
     const url=r['school.school_url']; const link=url?('https://'+(''+url).replace(/^https?:\/\//,'')):null;
     const sr=satRange(r), arr=actRange(r);
@@ -1453,7 +1581,7 @@ function renderColleges(rows, majors, info){
     </div>`;
   }).join('') + ((info&&info.hasMore)?`<p class="noprint" style="text-align:center;margin:12px 0 2px"><button class="sec" id="cMoreBtn" onclick="loadMoreColleges()">⬇ Show ${(_searchCursor&&_searchCursor.want)||25} more schools</button></p>`:'');
 }
-function refreshCollegeMatch(){ if(_scRows) renderColleges(_scRows,_scMajor,_scInfo); }
+function refreshCollegeMatch(){ if(_searchCursor&&_searchCursor.match) renderSearchPage(); else if(_scRows) renderColleges(_scRows,_scMajor,_scInfo); }
 function openCompare(){
   const ids=Object.keys(favs); const body=document.getElementById('compareBody');
   if(!ids.length){ body.innerHTML='<p class="note">No starred schools yet. Click the ☆ next to a school to add it.</p>'; }
@@ -1513,6 +1641,12 @@ function exportResults(){
     ['Overall GPA (weighted)',g('ov7w'),g('ov10w')].join(','),
     ['NCAA core GPA',g('nc7'),g('nc10')].join(','),
     ['NCAA core units',g('nu7'),g('nu10')].join(','),
+    ...(_distExport? [
+      ['DI core units counted toward 16',..._distExport.di].join(','),
+      ['DII core units counted toward 16',..._distExport.dii].join(','),
+      ['DI core units before senior year (need 10)',..._distExport.pre].join(','),
+      ['DI English/math/science units before senior year (need 7)',..._distExport.preEms].join(',')
+    ] : []),
     ['NAIA overall GPA',g('na7'),g('na10')].join(','),
     ['NAIA status (2 of 3)',t('na7b'),t('na10b')].join(','),
     ['ACT composite',csvCell(val('act')||'-'),''].join(','),
